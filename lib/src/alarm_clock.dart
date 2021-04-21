@@ -32,19 +32,19 @@ class AlarmClock {
   bool enableFlashLamp;
 
   ///刻钟报时音文件
-  String quarterAlarmSound;
+  dynamic quarterAlarmSound;
   int quarterSoundIdx;
 
   ///半点报时音文件
-  String halfAlarmSound;
+  dynamic halfAlarmSound;
   int halfSoundIdx;
 
   ///整点报时音文件
-  String oclockAlarmSound;
+  dynamic oclockAlarmSound;
   int oclockSoundIdx;
 
   ///静音开关
-  bool isSlient=false;
+  bool isSlient = false;
 
   String normalAlarmMessageTemplate = "现在是 {}";
   String anytimeTemplate = "{}点{}分";
@@ -53,23 +53,23 @@ class AlarmClock {
   String aQuarterTemplate = "{}点一刻";
   String threeQuarterTemplate = "{}点三刻";
 
-  Map<String,Schedule> specialAlarms=Map<String,Schedule>();
+  Map<String, Schedule> specialAlarms = Map<String, Schedule>();
 
   final Logger logger = Logger('AlarmClock');
 
   AlarmClock(
       {dynamic newSchedule,
-        actionCall newAlarmAction,
-        dynamic noSoundSchedule,
-        dynamic noWakeLockSchedule,
-        this.sleepEnableAction,
-        this.sleepDisableAction,
-        this.enableVibrate = true,
-        this.enableAlarmSound = true,
-        this.enableFlashLamp = true,
-        this.quarterAlarmSound,
-        this.halfAlarmSound,
-        this.oclockAlarmSound}) {
+      actionCall newAlarmAction,
+      dynamic noSoundSchedule,
+      dynamic noWakeLockSchedule,
+      this.sleepEnableAction,
+      this.sleepDisableAction,
+      this.enableVibrate = true,
+      this.enableAlarmSound = true,
+      this.enableFlashLamp = true,
+      this.quarterAlarmSound,
+      this.halfAlarmSound,
+      this.oclockAlarmSound}) {
     if (newSchedule != null) {
       if (newSchedule is Schedule) alarmSchedule = newSchedule;
       if (newSchedule is String) alarmSchedule = Schedule.parse(newSchedule);
@@ -91,12 +91,12 @@ class AlarmClock {
       if (noWakeLockSchedule is String)
         sleepSchedule = Schedule.parse(noWakeLockSchedule);
     }
-    if (sleepSchedule?.match(DateTime.now()) == false){
+    if (sleepSchedule?.match(DateTime.now()) == false) {
       logger.fine("do wakelock");
-      if(sleepDisableAction!=null)sleepDisableAction();
-    }else{
+      if (sleepDisableAction != null) sleepDisableAction();
+    } else {
       logger.fine("do not wakelock");
-      if(sleepEnableAction!=null)sleepEnableAction();
+      if (sleepEnableAction != null) sleepEnableAction();
     }
 
     if (enableVibrate) vibrate.init();
@@ -110,12 +110,12 @@ class AlarmClock {
 
   void initAsync() async {
     if (enableAlarmSound) {
-      oclockSoundIdx =
-      await sound.loadSound(oclockAlarmSound ?? "assets/voices/座钟报时.mp3");
-      halfSoundIdx =
-      await sound.loadSound(halfAlarmSound ?? "assets/voices/短促欢愉.mp3");
-      quarterSoundIdx =
-      await sound.loadSound(quarterAlarmSound ?? "assets/voices/钟琴颤音.mp3");
+      if (oclockAlarmSound != null)
+        oclockSoundIdx = await sound.loadSound(oclockAlarmSound);
+      if (halfAlarmSound != null)
+        halfSoundIdx = await sound.loadSound(halfAlarmSound);
+      if (quarterAlarmSound != null)
+        quarterSoundIdx = await sound.loadSound(quarterAlarmSound);
     }
 
     // Uri uriRes=Uri.parse("http://olgeer.3322.org:8888/justclock/iphone.mp3");
@@ -135,8 +135,8 @@ class AlarmClock {
     alarmTask = cron.schedule(alarmSchedule, alarmAction);
   }
 
-  set setSlient(bool b){
-    isSlient=b;
+  set setSlient(bool b) {
+    isSlient = b;
     logger.fine("isSlient is $b");
   }
 
@@ -148,85 +148,96 @@ class AlarmClock {
   set noWakeLockSchedule(Schedule s) => sleepSchedule = s;
   Schedule get noWakeLockSchedule => sleepSchedule;
 
-  String get alarmTemplate{
-    String alarmTmp=normalAlarmMessageTemplate;
-    if(specialAlarms.isNotEmpty){
-      DateTime now=DateTime.now();
+  String get alarmTemplate {
+    String alarmTmp = normalAlarmMessageTemplate;
+    if (specialAlarms.isNotEmpty) {
+      DateTime now = DateTime.now();
 
       specialAlarms.forEach((key, value) {
-        if(value.match(now)){
-          if(key.contains("{}"))alarmTmp=key;
-          else alarmTmp="$key\n$alarmTmp";
+        if (value.match(now)) {
+          if (key.contains("{}"))
+            alarmTmp = key;
+          else
+            alarmTmp = "$key\n$alarmTmp";
         }
       });
     }
     return alarmTmp;
   }
 
-  void addSpecialSchedule(Schedule s,String alarmTemplate){
-    assert(s!=null && alarmTemplate!=null);
+  void addSpecialSchedule(Schedule s, String alarmTemplate) {
+    assert(s != null && alarmTemplate != null);
     specialAlarms.putIfAbsent(alarmTemplate, () => s);
   }
 
-  void clearSpecialSchedule()=>specialAlarms.clear();
+  void clearSpecialSchedule() => specialAlarms.clear();
 
   void dispose() {
     sound.soundpool.dispose();
-    if(sleepEnableAction!=null)sleepEnableAction();
+    if (sleepEnableAction != null) sleepEnableAction();
     alarmTask.cancel();
   }
 
-  void playSound(int soundIdx,{bool repeat,Duration duration}) {
+  void playSound(int soundIdx, {bool repeat, Duration duration}) {
     //仅设定时间段内报时
     if (!(slientSchedule?.match(DateTime.now()) ?? false) && !isSlient) {
-      sound.play(soundIdx,repeat: repeat??duration!=null,duration: duration);
+      sound.play(soundIdx,
+          repeat: repeat ?? duration != null, duration: duration);
     }
   }
 
   void alarm() {
     var now = DateTime.now();
-    if(sleepDisableAction!=null)sleepDisableAction();
+    if (sleepDisableAction != null) sleepDisableAction();
     String alertMsg = this.alarmTemplate;
     String alertTime;
     switch (now.minute) {
       case 15:
         alertTime = aQuarterTemplate.tl(args: [now.hour.toString()]);
-        playSound(quarterSoundIdx,repeat: true,duration:Duration(seconds: 2));
-        intervalAction(FlashLamp.flash,millisecondInterval: [300]);
+        if (quarterSoundIdx != null)
+          playSound(quarterSoundIdx,
+              repeat: true, duration: Duration(seconds: 2));
+        intervalAction(FlashLamp.flash, millisecondInterval: [300]);
         vibrate.littleShake();
         break;
       case 45:
         alertTime = threeQuarterTemplate.tl(args: [now.hour.toString()]);
-        playSound(quarterSoundIdx,repeat: true,duration:Duration(seconds: 2));
-        intervalAction(FlashLamp.flash,millisecondInterval: [300]);
+        if (quarterSoundIdx != null)
+          playSound(quarterSoundIdx,
+              repeat: true, duration: Duration(seconds: 2));
+        intervalAction(FlashLamp.flash, millisecondInterval: [300]);
         vibrate.littleShake();
         break;
       case 30:
         alertTime = halfPastTemplate.tl(args: [now.hour.toString()]);
-        playSound(halfSoundIdx,repeat: true,duration:Duration(seconds: 3));
-        intervalAction(FlashLamp.flash,millisecondInterval: [300,1300,1600]);
+        if (halfSoundIdx != null)
+          playSound(halfSoundIdx, repeat: true, duration: Duration(seconds: 3));
+        intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
         vibrate.mediumVibrate();
         break;
       case 0:
         alertTime = oclockTemplate.tl(args: [now.hour.toString()]);
-        playSound(oclockSoundIdx,repeat: true,duration:Duration(seconds: 10));
-        intervalAction(FlashLamp.flash,millisecondInterval: [300,1300,1600,3300,3600,4300,4600]);
+        if (oclockSoundIdx != null)
+          playSound(oclockSoundIdx,
+              repeat: true, duration: Duration(seconds: 10));
+        intervalAction(FlashLamp.flash,
+            millisecondInterval: [300, 1300, 1600, 3300, 3600, 4300, 4600]);
         vibrate.longVibrate();
         break;
       default:
-        alertTime =
-            anytimeTemplate.tl(args: [now.hour.toString(), now.minute.toString()]);
-        playSound(quarterSoundIdx);
-        intervalAction(FlashLamp.flash,millisecondInterval: [300,1300,1600]);
+        alertTime = anytimeTemplate
+            .tl(args: [now.hour.toString(), now.minute.toString()]);
+        if (quarterSoundIdx != null) playSound(quarterSoundIdx);
+        intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
         vibrate.mediumVibrate();
         break;
     }
 
     //按休眠计划改变激活锁定状态
-    if (sleepSchedule?.match(now)==false) {
-      if(sleepDisableAction!=null)sleepDisableAction();
+    if (sleepSchedule?.match(now) == false) {
+      if (sleepDisableAction != null) sleepDisableAction();
     } else {
-      if(sleepEnableAction!=null)sleepEnableAction();
+      if (sleepEnableAction != null) sleepEnableAction();
     }
 
     showToast(alertMsg.tl(args: [alertTime]));
@@ -234,9 +245,9 @@ class AlarmClock {
 
   void showToast(String msg,
       {int showInSec = 2,
-        ToastGravity gravity = ToastGravity.BOTTOM,
-        double fontSize = 16.0,
-        bool debugMode = true}) {
+      ToastGravity gravity = ToastGravity.BOTTOM,
+      double fontSize = 16.0,
+      bool debugMode = true}) {
     Fluttertoast.showToast(
       msg: msg,
       toastLength: Toast.LENGTH_SHORT,
@@ -244,7 +255,7 @@ class AlarmClock {
       timeInSecForIosWeb: showInSec,
       fontSize: fontSize,
     );
-    if (debugMode)logger.fine(msg);
+    if (debugMode) logger.fine(msg);
   }
 
   ///按一定时间间隔重复执行processer方法，方法调用后立即执行processer方法，如millisecondInterval不为null则按此间隔继续执行

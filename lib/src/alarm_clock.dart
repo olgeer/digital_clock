@@ -19,8 +19,8 @@ class AlarmClock {
 
   ///允许休眠时段
   Schedule sleepSchedule;
-  actionCall sleepEnableAction = (){};
-  actionCall sleepDisableAction = (){};
+  actionCall sleepEnableAction;
+  actionCall sleepDisableAction;
 
   ///允许震动开关
   bool enableVibrate;
@@ -93,10 +93,10 @@ class AlarmClock {
     }
     if (sleepSchedule?.match(DateTime.now()) == false){
       logger.fine("do wakelock");
-      sleepDisableAction();
+      if(sleepDisableAction!=null)sleepDisableAction();
     }else{
       logger.fine("do not wakelock");
-      sleepEnableAction();
+      if(sleepEnableAction!=null)sleepEnableAction();
     }
 
     if (enableVibrate) vibrate.init();
@@ -172,7 +172,7 @@ class AlarmClock {
 
   void dispose() {
     sound.soundpool.dispose();
-    sleepEnableAction();
+    if(sleepEnableAction!=null)sleepEnableAction();
     alarmTask.cancel();
   }
 
@@ -185,7 +185,7 @@ class AlarmClock {
 
   void alarm() {
     var now = DateTime.now();
-    sleepDisableAction();
+    if(sleepDisableAction!=null)sleepDisableAction();
     String alertMsg = this.alarmTemplate;
     String alertTime;
     switch (now.minute) {
@@ -224,9 +224,9 @@ class AlarmClock {
 
     //按休眠计划改变激活锁定状态
     if (sleepSchedule?.match(now)==false) {
-      sleepDisableAction();
+      if(sleepDisableAction!=null)sleepDisableAction();
     } else {
-      sleepEnableAction();
+      if(sleepEnableAction!=null)sleepEnableAction();
     }
 
     showToast(alertMsg.tl(args: [alertTime]));

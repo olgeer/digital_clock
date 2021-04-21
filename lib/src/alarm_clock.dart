@@ -19,8 +19,8 @@ class AlarmClock {
 
   ///允许休眠时段
   Schedule sleepSchedule;
-  actionCall sleepEnableAction = () => null;
-  actionCall sleepDisableAction = () => null;
+  actionCall sleepEnableAction = (){};
+  actionCall sleepDisableAction = (){};
 
   ///允许震动开关
   bool enableVibrate;

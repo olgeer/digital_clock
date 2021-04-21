@@ -2,13 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'flipNumber.dart';
+import 'define.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
 import 'package:wakelock/wakelock.dart';
 
-typedef voidProc = void Function();
-typedef eventCall = void Function(dynamic value);
 typedef contextProc = void Function(BuildContext context);
 
 class DigitalClock extends StatefulWidget {
@@ -180,7 +179,7 @@ class DigitalClockState extends State<DigitalClock>
   }
 
   ///按一定时间间隔重复执行processer方法，方法调用后立即执行processer方法，如millisecondInterval不为null则按此间隔继续执行
-  void intervalAction(voidProc processer, {List<int> millisecondInterval}) {
+  void intervalAction(actionCall processer, {List<int> millisecondInterval}) {
     if (processer != null) {
       processer();
       if (millisecondInterval?.isNotEmpty == true) {

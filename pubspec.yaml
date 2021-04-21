@@ -13,6 +13,11 @@ dependencies:
     sdk: flutter
   logging: ^0.11.4
   wakelock: ^0.1.4+2
+  zeking_flash_lamp: ^0.0.1
+  vibration: ^1.7.1
+  cron: ^0.2.3
+  soundpool: ^1.1.3
+  fluttertoast: ^4.0.0
 
 dev_dependencies:
   flutter_test:

@@ -91,13 +91,7 @@ class AlarmClock {
       if (noWakeLockSchedule is String)
         sleepSchedule = Schedule.parse(noWakeLockSchedule);
     }
-    if (sleepSchedule?.match(DateTime.now()) == false) {
-      logger.fine("do wakelock");
-      if (sleepDisableAction != null) sleepDisableAction();
-    } else {
-      logger.fine("do not wakelock");
-      if (sleepEnableAction != null) sleepEnableAction();
-    }
+    setSleepState();
 
     if (enableVibrate) vibrate.init();
 
@@ -106,6 +100,18 @@ class AlarmClock {
     if (enableFlashLamp) FlashLamp.init();
 
     initAsync();
+  }
+
+  void setSleepState(){
+    if (sleepSchedule?.match(DateTime.now()) == false) {
+      logger.fine("do wakelock");
+      // if (sleepDisableAction != null) sleepDisableAction();
+      sleepDisableAction?.call();
+    } else {
+      logger.fine("do not wakelock");
+      // if (sleepEnableAction != null) sleepEnableAction();
+      sleepEnableAction?.call();
+    }
   }
 
   void initAsync() async {
@@ -145,7 +151,11 @@ class AlarmClock {
   set noSoundSchedule(Schedule s) => slientSchedule = s;
   Schedule get noSoundSchedule => slientSchedule;
 
-  set noWakeLockSchedule(Schedule s) => sleepSchedule = s;
+  set noWakeLockSchedule(Schedule s) {
+    sleepSchedule = s;
+    setSleepState();
+  }
+
   Schedule get noWakeLockSchedule => sleepSchedule;
 
   String get alarmTemplate {
@@ -174,7 +184,8 @@ class AlarmClock {
 
   void dispose() {
     sound.soundpool.dispose();
-    if (sleepEnableAction != null) sleepEnableAction();
+    // if (sleepEnableAction != null) sleepEnableAction();
+    sleepEnableAction?.call();
     alarmTask.cancel();
   }
 
@@ -188,7 +199,8 @@ class AlarmClock {
 
   void alarm() {
     var now = DateTime.now();
-    if (sleepDisableAction != null) sleepDisableAction();
+    // if (sleepDisableAction != null) sleepDisableAction();
+    sleepDisableAction?.call();
     String alertMsg = this.alarmTemplate;
     String alertTime;
     switch (now.minute) {
@@ -235,9 +247,11 @@ class AlarmClock {
 
     //按休眠计划改变激活锁定状态
     if (sleepSchedule?.match(now) == false) {
-      if (sleepDisableAction != null) sleepDisableAction();
+      // if (sleepDisableAction != null) sleepDisableAction();
+      sleepDisableAction?.call();
     } else {
-      if (sleepEnableAction != null) sleepEnableAction();
+      // if (sleepEnableAction != null) sleepEnableAction();
+      sleepEnableAction?.call();
     }
 
     showToast(alertMsg.tl(args: [alertTime]));

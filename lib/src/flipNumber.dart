@@ -24,7 +24,7 @@ class FlipNumber extends StatefulWidget {
     this.currentValue = 0,
   });
 
-  void test(){}
+  void test() {}
 
   @override
   State<StatefulWidget> createState() {
@@ -51,7 +51,7 @@ class _FlipNumberState extends State<FlipNumber>
   void initState() {
     _isPositiveSequence = widget.isPositiveSequence;
     calcValue(initValue: widget.currentValue ?? widget.min);
-    widget.currentValue=null;
+    widget.currentValue = null;
 
     // 5 秒动画，利用 reset、forward 重复执行
     _controller = AnimationController(
@@ -94,7 +94,7 @@ class _FlipNumberState extends State<FlipNumber>
     // 动画完成时，添加数字检测，实现动画
     _controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
-        calcValue(initValue:widget.currentValue);
+        calcValue(initValue: widget.currentValue);
         // 重置动画
         _controller.reset();
         // 重新开启动画
@@ -131,7 +131,7 @@ class _FlipNumberState extends State<FlipNumber>
       }
     } else {
       _nextIndex = _currentIndex - 1;
-      if (_nextIndex < 0) {
+      if (_nextIndex < widget.min) {
         if (widget.canRevese) {
           _isPositiveSequence = !_isPositiveSequence;
           // _currentIndex = widget.min;
@@ -249,13 +249,13 @@ class Pannel extends StatelessWidget {
   Widget buildImage(String picName, {BoxFit fit = BoxFit.cover}) {
     return picName.contains("assets:")
         ? Image.asset(
-      picName.replaceFirst("assets:", ""),
-      fit: fit,
-    )
+            picName.replaceFirst("assets:", ""),
+            fit: fit,
+          )
         : Image.file(
-      File(picName),
-      fit: fit,
-    );
+            File(picName),
+            fit: fit,
+          );
   }
 
   String int2Str(int value, {int width = 2}) {
@@ -302,7 +302,8 @@ class Pannel extends StatelessWidget {
       width: picItem.rect.width * scale,
       margin: EdgeInsets.all(0.0),
       alignment: Alignment.center,
-      child: buildImage(picName,
+      child: buildImage(
+        picName,
         fit: BoxFit.cover,
       ),
     );

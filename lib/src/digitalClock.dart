@@ -48,7 +48,7 @@ class DigitalClockState extends State<DigitalClock>
   double xScale, yScale;
   AnimationController animationController;
   Animation<Color> animation;
-  Logger logger=Logger("DigitalClock");
+  Logger logger = Logger("DigitalClock");
 
   @override
   void initState() {
@@ -161,11 +161,13 @@ class DigitalClockState extends State<DigitalClock>
   int getHour(int h) {
     int hour = h;
     if (widget.config.timeType == TimeType.h12) {
-      if (h > 12) {
+      if (h>=12) {
         hour -= 12;
         h12 = 1;
-      } else
+      } else {
         h12 = 0;
+      }
+      hour = hour == 0 ? 12 : hour;
     }
     return hour;
   }
@@ -193,8 +195,9 @@ class DigitalClockState extends State<DigitalClock>
   void tiktok() {
     DateTime now = DateTime.now();
     // if(animationController==null||animationController?.status==AnimationStatus.dismissed)animationController?.forward();
+
     if (getHour(now.hour) != hours && hourFlipNumber != null) {
-      hourFlipNumber.currentValue = now.hour;
+      hourFlipNumber.currentValue = getHour(now.hour);
       hourFlipNumber?.controller?.forward();
       intervalAction(animationController?.forward,
           millisecondInterval: [300, 1300, 1600, 2300, 3600]);
@@ -759,7 +762,7 @@ class DigitalClockState extends State<DigitalClock>
     return Container(
         height: widget.height,
         width: widget.width,
-        color: animation?.value??widget.config.backgroundColor,
+        color: animation?.value ?? widget.config.backgroundColor,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -863,7 +866,7 @@ class ItemConfig {
         style: j["style"],
         rect: json2Rect(j["rect"]),
         // imgs: objectListToStringList(j["imgs"]),
-        imgs: j["imgs"]==null?null:List.castFrom(j["imgs"]),
+        imgs: j["imgs"] == null ? null : List.castFrom(j["imgs"]),
         imgPrename: j["imgPrename"],
         imgExtname: j["imgExtname"],
         textStyle: json2TextStyle(j["textStyle"]));
@@ -1014,7 +1017,7 @@ class DigitalClockConfig {
       exitItem: ItemConfig.fromJson(jMap["exitItem"]),
       slientItem: ItemConfig.fromJson(jMap["slientItem"]),
       backgroundColor: Color(jMap["backgroundColor"] ?? 0x00000000),
-      blinkColor: jMap["blinkColor"]==null?null:Color(jMap["blinkColor"]),
+      blinkColor: jMap["blinkColor"] == null ? null : Color(jMap["blinkColor"]),
       foregroundColor: Color(jMap["foregroundColor"] ?? 0x00ffffff),
       backgroundImage: jMap["backgroundImage"],
       bodyImage: ItemConfig.fromJson(jMap["bodyImage"]),

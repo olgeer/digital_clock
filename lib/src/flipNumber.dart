@@ -4,27 +4,26 @@ import 'package:flutter/material.dart';
 import 'digitalClock.dart';
 
 class FlipNumber extends StatefulWidget {
-  ItemConfig numberItem;
-  String basePath;
-  double scale;
-  Duration animationDuration;
-  int min, max, currentValue;
-  bool canRevese, isPositiveSequence;
+  final ItemConfig numberItem;
+  final String basePath;
+  final double scale;
+  final Duration animationDuration;
+  final int min, max;
+  int currentValue;
+  final bool canRevese, isPositiveSequence;
   AnimationController controller;
 
   FlipNumber({
-    this.numberItem,
-    this.basePath,
-    this.scale,
-    this.animationDuration,
+    @required this.numberItem,
+    @required this.basePath,
+    this.scale=1.0,
+    this.animationDuration=const Duration(milliseconds: 2000),
     this.min = 0,
     this.max = 23,
     this.canRevese = true,
     this.isPositiveSequence = true,
     this.currentValue = 0,
   });
-
-  void test() {}
 
   @override
   State<StatefulWidget> createState() {

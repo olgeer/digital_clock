@@ -4,7 +4,7 @@ import 'package:soundpool/soundpool.dart';
 class Sound {
   static Soundpool soundpool;
 
-  static void initSound() async {
+  static Future init() async {
     soundpool = Soundpool(
       maxStreams: 1,
     );
@@ -20,7 +20,7 @@ class Sound {
   }
 
   static Future<int> loadSound(dynamic soundMedia) async {
-    if (soundpool == null) initSound();
+    if (soundpool == null) await init();
     if (soundMedia is ByteData) return await soundpool.load(soundMedia);
     if (soundMedia is Uri)
       return await soundpool.loadUri(soundMedia.origin + soundMedia.path);

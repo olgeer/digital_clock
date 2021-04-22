@@ -64,7 +64,6 @@ class DigitalClockState extends State<DigitalClock>
   @override
   void dispose() {
     clockTimer.cancel();
-    Wakelock.disable();
     SystemChrome.setEnabledSystemUIOverlays(
         [SystemUiOverlay.top, SystemUiOverlay.bottom]);
     super.dispose();
@@ -145,7 +144,7 @@ class DigitalClockState extends State<DigitalClock>
       }
     }
 
-    Wakelock.enable();
+    // Wakelock.enable();
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
   }
 

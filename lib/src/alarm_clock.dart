@@ -2,8 +2,8 @@ import 'define.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logging/logging.dart';
 import 'package:cron/cron.dart';
-import 'sound.dart' as sound;
-import 'vibrate.dart' as vibrate;
+import 'sound.dart';
+import 'vibrate.dart';
 import 'lamp.dart';
 
 class AlarmClock {
@@ -93,9 +93,9 @@ class AlarmClock {
     }
     setSleepState();
 
-    if (enableVibrate) vibrate.init();
+    if (enableVibrate) Vibrate.init();
 
-    if (enableAlarmSound) sound.initSound();
+    if (enableAlarmSound) Sound.initSound();
 
     if (enableFlashLamp) FlashLamp.init();
 
@@ -117,11 +117,11 @@ class AlarmClock {
   void initAsync() async {
     if (enableAlarmSound) {
       if (oclockAlarmSound != null)
-        oclockSoundIdx = await sound.loadSound(oclockAlarmSound);
+        oclockSoundIdx = await Sound.loadSound(oclockAlarmSound);
       if (halfAlarmSound != null)
-        halfSoundIdx = await sound.loadSound(halfAlarmSound);
+        halfSoundIdx = await Sound.loadSound(halfAlarmSound);
       if (quarterAlarmSound != null)
-        quarterSoundIdx = await sound.loadSound(quarterAlarmSound);
+        quarterSoundIdx = await Sound.loadSound(quarterAlarmSound);
     }
 
     // Uri uriRes=Uri.parse("http://olgeer.3322.org:8888/justclock/iphone.mp3");
@@ -183,7 +183,7 @@ class AlarmClock {
   void clearSpecialSchedule() => specialAlarms.clear();
 
   void dispose() {
-    sound.soundpool.dispose();
+    Sound.soundpool.dispose();
     // if (sleepEnableAction != null) sleepEnableAction();
     sleepEnableAction?.call();
     alarmTask.cancel();
@@ -192,7 +192,7 @@ class AlarmClock {
   void playSound(int soundIdx, {bool repeat, Duration duration}) {
     //仅设定时间段内报时
     if (!(slientSchedule?.match(DateTime.now()) ?? false) && !isSlient) {
-      sound.play(soundIdx,
+      Sound.play(soundIdx,
           repeat: repeat ?? duration != null, duration: duration);
     }
   }
@@ -210,7 +210,7 @@ class AlarmClock {
           playSound(quarterSoundIdx,
               repeat: true, duration: Duration(seconds: 2));
         intervalAction(FlashLamp.flash, millisecondInterval: [300]);
-        vibrate.littleShake();
+        Vibrate.littleShake();
         break;
       case 45:
         alertTime = threeQuarterTemplate.tl(args: [now.hour.toString()]);
@@ -218,14 +218,14 @@ class AlarmClock {
           playSound(quarterSoundIdx,
               repeat: true, duration: Duration(seconds: 2));
         intervalAction(FlashLamp.flash, millisecondInterval: [300]);
-        vibrate.littleShake();
+        Vibrate.littleShake();
         break;
       case 30:
         alertTime = halfPastTemplate.tl(args: [now.hour.toString()]);
         if (halfSoundIdx != null)
           playSound(halfSoundIdx, repeat: true, duration: Duration(seconds: 3));
         intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
-        vibrate.mediumVibrate();
+        Vibrate.mediumVibrate();
         break;
       case 0:
         alertTime = oclockTemplate.tl(args: [now.hour.toString()]);
@@ -234,14 +234,14 @@ class AlarmClock {
               repeat: true, duration: Duration(seconds: 10));
         intervalAction(FlashLamp.flash,
             millisecondInterval: [300, 1300, 1600, 3300, 3600, 4300, 4600]);
-        vibrate.longVibrate();
+        Vibrate.longVibrate();
         break;
       default:
         alertTime = anytimeTemplate
             .tl(args: [now.hour.toString(), now.minute.toString()]);
         if (quarterSoundIdx != null) playSound(quarterSoundIdx);
         intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
-        vibrate.mediumVibrate();
+        Vibrate.mediumVibrate();
         break;
     }
 

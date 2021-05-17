@@ -143,6 +143,8 @@ class AlarmClock {
 
   set setSlient(bool b) {
     isSlient = b;
+    FlashLamp.useLamp=!b;
+    Vibrate.enableVibrate=!b;
     logger.fine("isSlient is $b");
   }
 

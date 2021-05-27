@@ -78,7 +78,7 @@ packages:
       name: fluttertoast
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.0.1"
+    version: "8.0.7"
   http:
     dependency: transitive
     description:

@@ -235,7 +235,7 @@ class AlarmClock {
         alertTime = oclockTemplate.tl(args: [now.hour.toString()]);
         if (oclockSoundIdx != null)
           playSound(oclockSoundIdx,
-              repeat: true, duration: Duration(seconds: 10));
+              repeat: true, duration: Duration(seconds: 4));
         intervalAction(FlashLamp.flash,
             millisecondInterval: [300, 1300, 1600, 3300, 3600, 4300, 4600]);
         Vibrate.longVibrate();

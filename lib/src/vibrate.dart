@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:vibration/vibration.dart';
 
 class Vibrate {
@@ -9,7 +10,8 @@ class Vibrate {
 
   static void init() async {
     //获取震动器信息
-    hasVibrator = await Vibration.hasVibrator();
+    if(Platform.isAndroid || Platform.isIOS)
+      hasVibrator = await Vibration.hasVibrator();
     hasAmplitudeControl = await Vibration.hasAmplitudeControl();
     hasCustomVibrationsSupport = await Vibration.hasCustomVibrationsSupport();
     enableVibrate = true;

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:phone_lamp/phone_lamp.dart';
 
 class FlashLamp {
@@ -7,7 +8,8 @@ class FlashLamp {
   static bool useLamp=true;
 
   static Future<bool> init()async{
-    hasLampDevice = await PhoneLamp.hasLamp;
+    if(Platform.isAndroid || Platform.isIOS)
+      hasLampDevice = await PhoneLamp.hasLamp;
     return hasLampDevice;
   }
 

@@ -10,11 +10,12 @@ class Vibrate {
 
   static void init() async {
     //获取震动器信息
-    if(Platform.isAndroid || Platform.isIOS)
+    if(Platform.isAndroid || Platform.isIOS) {
       hasVibrator = await Vibration.hasVibrator();
-    hasAmplitudeControl = await Vibration.hasAmplitudeControl();
-    hasCustomVibrationsSupport = await Vibration.hasCustomVibrationsSupport();
-    enableVibrate = true;
+      hasAmplitudeControl = await Vibration.hasAmplitudeControl();
+      hasCustomVibrationsSupport = await Vibration.hasCustomVibrationsSupport();
+      enableVibrate = true;
+    }
   }
 
   static void vibrateCustom({int duration = 500,

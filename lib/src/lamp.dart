@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'package:zeking_flash_lamp/zeking_flash_lamp.dart';
+import 'package:phone_lamp/phone_lamp.dart';
 
 class FlashLamp {
   static bool lampOn=false;
@@ -7,7 +7,7 @@ class FlashLamp {
   static bool useLamp=true;
 
   static Future<bool> init()async{
-    hasLampDevice = await ZekingFlashLamp.hasLamp;
+    hasLampDevice = await PhoneLamp.hasLamp;
     return hasLampDevice;
   }
 
@@ -37,14 +37,14 @@ class FlashLamp {
 
   static void turnOn({double intensity = 1.0}) {
     if (hasLamp && useLamp) {
-      ZekingFlashLamp.turnOn(intensity: intensity);
+      PhoneLamp.turnOn(intensity: intensity);
       lampOn=true;
     }
   }
 
   static void turnOff() {
     if (hasLamp && useLamp) {
-      ZekingFlashLamp.turnOff();
+      PhoneLamp.turnOff();
       lampOn=false;
     }
   }

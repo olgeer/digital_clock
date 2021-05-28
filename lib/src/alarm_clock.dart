@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'define.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logging/logging.dart';
@@ -264,13 +266,15 @@ class AlarmClock {
       ToastGravity gravity = ToastGravity.BOTTOM,
       double fontSize = 16.0,
       bool debugMode = true}) {
-    Fluttertoast.showToast(
-      msg: msg,
-      toastLength: Toast.LENGTH_SHORT,
-      gravity: gravity,
-      timeInSecForIosWeb: showInSec,
-      fontSize: fontSize,
-    );
+    if(Platform.isAndroid||Platform.isIOS) {
+      Fluttertoast.showToast(
+        msg: msg,
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: gravity,
+        timeInSecForIosWeb: showInSec,
+        fontSize: fontSize,
+      );
+    }
     if (debugMode) logger.fine(msg);
   }
 

@@ -147,7 +147,7 @@ packages:
     description:
       path: "."
       ref: main
-      resolved-ref: "936ba841d470b499397e18844de71d436cbd8efe"
+      resolved-ref: "1202d707043d032ed2a68be570c7fb9b5b234894"
       url: "https://github.com/olgeer/phone_lamp.git"
     source: git
     version: "0.0.1"

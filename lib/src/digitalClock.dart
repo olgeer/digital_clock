@@ -202,7 +202,7 @@ class DigitalClockState extends State<DigitalClock>
   void tiktok() {
     DateTime now = DateTime.now();
     // if(animationController==null||animationController?.status==AnimationStatus.dismissed)animationController?.forward();
-    logger.fine("Tiktok running $now");
+    logger.finest("Tiktok running $now");
     if (getHour(now.hour) != hours && hourFlipNumber != null) {
       hourFlipNumber.currentValue = getHour(now.hour);
       hourFlipNumber?.controller?.forward();
@@ -764,10 +764,10 @@ class DigitalClockState extends State<DigitalClock>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.sizeChange) {
-      initScale();
-    }
-    if(widget.config.skinName.compareTo(currentSkinName) != 0 ){
+    // if (widget.sizeChange) {
+    //   initScale();
+    // }
+    if(widget.config.skinName.compareTo(currentSkinName) != 0 ||widget.sizeChange){
       initScale();
       init();
     }

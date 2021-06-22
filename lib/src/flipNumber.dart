@@ -17,8 +17,8 @@ class FlipNumber extends StatefulWidget {
   FlipNumber({
     @required this.numberItem,
     @required this.basePath,
-    this.scale=1.0,
-    this.animationDuration=const Duration(milliseconds: 2000),
+    this.scale = 1.0,
+    this.animationDuration = const Duration(milliseconds: 2000),
     this.min = 0,
     this.max = 23,
     this.canRevese = true,
@@ -47,10 +47,12 @@ class _FlipNumberState extends State<FlipNumber>
   // 下一个数值
   int _nextIndex;
 
-  Logger logger=Logger("FlipNumber");
+  Logger logger = Logger("FlipNumber");
 
   @override
   void initState() {
+    super.initState();
+
     logger.finer("initState running...");
     _isPositiveSequence = widget.isPositiveSequence;
     calcValue(initValue: widget.currentValue ?? widget.min);
@@ -95,24 +97,25 @@ class _FlipNumberState extends State<FlipNumber>
     });
 
     // 动画完成时，添加数字检测，实现动画
-    _controller.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        calcValue(initValue: widget.currentValue);
-        // 重置动画
-        _controller.reset();
-        // 重新开启动画
-        // _controller.forward();
-        setState(() {});
-      }
-    });
+    _controller.addStatusListener(animationListener);
     // 默认开启动画，也使用 press 效果触发。
     // _controller.forward();
+  }
 
-    super.initState();
+  void animationListener(AnimationStatus status) {
+    if (status == AnimationStatus.completed) {
+      calcValue(initValue: widget.currentValue);
+      // 重置动画
+      _controller.reset();
+      // 重新开启动画
+      // _controller.forward();
+      setState(() {});
+    }
   }
 
   @override
   void dispose() {
+    _controller.removeStatusListener(animationListener);
     _controller.dispose();
     super.dispose();
   }

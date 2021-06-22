@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:logging/logging.dart';
 import 'digitalClock.dart';
 
 class FlipNumber extends StatefulWidget {
@@ -46,8 +47,11 @@ class _FlipNumberState extends State<FlipNumber>
   // 下一个数值
   int _nextIndex;
 
+  Logger logger=Logger("FlipNumber");
+
   @override
   void initState() {
+    logger.finer("initState running...");
     _isPositiveSequence = widget.isPositiveSequence;
     calcValue(initValue: widget.currentValue ?? widget.min);
     widget.currentValue = null;

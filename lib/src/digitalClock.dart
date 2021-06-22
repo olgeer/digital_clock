@@ -197,7 +197,7 @@ class DigitalClockState extends State<DigitalClock>
   void tiktok() {
     DateTime now = DateTime.now();
     // if(animationController==null||animationController?.status==AnimationStatus.dismissed)animationController?.forward();
-
+    logger.fine("Tiktok running $now");
     if (getHour(now.hour) != hours && hourFlipNumber != null) {
       hourFlipNumber.currentValue = getHour(now.hour);
       hourFlipNumber?.controller?.forward();
@@ -205,7 +205,7 @@ class DigitalClockState extends State<DigitalClock>
           millisecondInterval: [300, 1300, 1600, 2300, 3600]);
     }
     if (now.minute != minutes && minuteFlipNumber != null) {
-      logger.fine("minuteFlipNumber flip ! $now");
+      logger.fine("minuteFlipNumber flip !");
       minuteFlipNumber.currentValue = now.minute;
       minuteFlipNumber?.controller?.forward();
       if (now.minute == 30) {

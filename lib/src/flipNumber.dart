@@ -7,7 +7,7 @@ import 'digitalClock.dart';
 class FlipNumber extends StatefulWidget {
   final ItemConfig numberItem;
   final String basePath;
-  final double scale;
+  double scale;
   final Duration animationDuration;
   final int min, max;
   int currentValue;

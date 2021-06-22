@@ -114,17 +114,22 @@ class DigitalClockState extends State<DigitalClock>
     refreshTime(DateTime.now());
 
     if (widget.config.hourItem?.style == TimeStyle.flip.index) {
-      hourFlipNumber = FlipNumber(
-        scale: scale,
-        basePath: skinBasePath,
-        numberItem: widget.config.hourItem,
-        animationDuration: animationDuration,
-        canRevese: false,
-        isPositiveSequence: true,
-        min: widget.config.timeType == TimeType.h12 ? 1 : 0,
-        max: widget.config.timeType == TimeType.h12 ? 12 : 23,
-        currentValue: hours,
-      );
+      if(hourFlipNumber==null) {
+        hourFlipNumber = FlipNumber(
+          scale: scale,
+          basePath: skinBasePath,
+          numberItem: widget.config.hourItem,
+          animationDuration: animationDuration,
+          canRevese: false,
+          isPositiveSequence: true,
+          min: widget.config.timeType == TimeType.h12 ? 1 : 0,
+          max: widget.config.timeType == TimeType.h12 ? 12 : 23,
+          currentValue: hours,
+        );
+      }else{
+        hourFlipNumber.scale=scale;
+        hourFlipNumber.currentValue=hours;
+      }
     } else {
       if (hourFlipNumber != null) {
         // hourFlipNumber.controller.dispose();
@@ -133,17 +138,22 @@ class DigitalClockState extends State<DigitalClock>
     }
 
     if (widget.config.minuteItem?.style == TimeStyle.flip.index) {
-      minuteFlipNumber = FlipNumber(
-        scale: scale,
-        basePath: skinBasePath,
-        numberItem: widget.config.minuteItem,
-        animationDuration: animationDuration,
-        canRevese: false,
-        isPositiveSequence: true,
-        min: 0,
-        max: 59,
-        currentValue: minutes,
-      );
+      if(minuteFlipNumber==null) {
+        minuteFlipNumber = FlipNumber(
+          scale: scale,
+          basePath: skinBasePath,
+          numberItem: widget.config.minuteItem,
+          animationDuration: animationDuration,
+          canRevese: false,
+          isPositiveSequence: true,
+          min: 0,
+          max: 59,
+          currentValue: minutes,
+        );
+      }else{
+        minuteFlipNumber.scale=scale;
+        minuteFlipNumber.currentValue=minutes;
+      }
     } else {
       if (minuteFlipNumber != null) {
         // minuteFlipNumber.controller.dispose();

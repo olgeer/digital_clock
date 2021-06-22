@@ -131,6 +131,7 @@ class DigitalClockState extends State<DigitalClock>
       }else{
         hourFlipNumber.scale=scale;
         hourFlipNumber.currentValue=hours;
+        hourFlipNumber.refresh();
       }
     } else {
       if (hourFlipNumber != null) {
@@ -155,6 +156,7 @@ class DigitalClockState extends State<DigitalClock>
       }else{
         minuteFlipNumber.scale=scale;
         minuteFlipNumber.currentValue=minutes;
+        minuteFlipNumber.refresh();
       }
     } else {
       if (minuteFlipNumber != null) {
@@ -165,7 +167,6 @@ class DigitalClockState extends State<DigitalClock>
 
     // Wakelock.enable();
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-    setState(() {});
   }
 
   void refreshTime(DateTime now) {

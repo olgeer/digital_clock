@@ -13,6 +13,7 @@ class FlipNumber extends StatefulWidget {
   int currentValue;
   final bool canRevese, isPositiveSequence;
   AnimationController controller;
+  void Function() refresh;
 
   FlipNumber({
     @required this.numberItem,
@@ -49,11 +50,17 @@ class _FlipNumberState extends State<FlipNumber>
 
   Logger logger = Logger("FlipNumber");
 
+  void refresh(){
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
-
     logger.finer("initState running...");
+
+    widget.refresh=refresh;
+
     _isPositiveSequence = widget.isPositiveSequence;
     calcValue(initValue: widget.currentValue ?? widget.min);
     widget.currentValue = null;

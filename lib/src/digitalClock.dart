@@ -12,6 +12,7 @@ typedef contextProc = void Function(BuildContext context);
 class DigitalClock extends StatefulWidget {
   final double height;
   final double width;
+  bool _sizeChange=false;
   DigitalClockConfig config;
   eventCall onClockEvent;
   contextProc onExitAction;
@@ -30,6 +31,8 @@ class DigitalClock extends StatefulWidget {
 
   void fireClockEvent(ClockEvent ce) =>
       onClockEvent != null ? onClockEvent(ce) : null;
+
+  set sizeChange(bool hasChange)=>_sizeChange=hasChange;
 }
 
 class DigitalClockState extends State<DigitalClock>
@@ -754,7 +757,7 @@ class DigitalClockState extends State<DigitalClock>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.config.skinName.compareTo(currentSkinName) != 0) {
+    if (widget.config.skinName.compareTo(currentSkinName) != 0 || widget._sizeChange) {
       init();
     }
     return Container(

@@ -54,13 +54,13 @@ class DigitalClockState extends State<DigitalClock>
 
   @override
   void initState() {
+    super.initState();
     init();
     if (widget.config.blinkColor != null) initAnimate();
     tiktok();
     clockTimer = Timer.periodic(Duration(seconds: 1), (timer) {
       tiktok();
     });
-    super.initState();
   }
 
   @override
@@ -205,6 +205,7 @@ class DigitalClockState extends State<DigitalClock>
           millisecondInterval: [300, 1300, 1600, 2300, 3600]);
     }
     if (now.minute != minutes && minuteFlipNumber != null) {
+      logger.fine("minuteFlipNumber flip ! $now");
       minuteFlipNumber.currentValue = now.minute;
       minuteFlipNumber?.controller?.forward();
       if (now.minute == 30) {

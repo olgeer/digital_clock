@@ -763,8 +763,12 @@ class DigitalClockState extends State<DigitalClock>
 
   @override
   Widget build(BuildContext context) {
-    if (widget.config.skinName.compareTo(currentSkinName) != 0 || widget.sizeChange) {
+    if ( widget.sizeChange) {
       initScale();
+    }
+    if(widget.config.skinName.compareTo(currentSkinName) != 0 ){
+      initScale();
+      init();
     }
     return Container(
         height: widget.height,

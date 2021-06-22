@@ -101,6 +101,7 @@ class DigitalClockState extends State<DigitalClock>
     scale = xScale < yScale ? xScale : yScale;
     logger.fine("widget.width=${widget.width} widget.height=${widget.height}");
     logger.fine("xs=$xScale ys=$yScale scale=$scale");
+    widget.sizeChange=false;
   }
 
   void init() {
@@ -152,7 +153,7 @@ class DigitalClockState extends State<DigitalClock>
 
     // Wakelock.enable();
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-    widget.sizeChange=false;
+
   }
 
   void refreshTime(DateTime now) {
@@ -763,7 +764,7 @@ class DigitalClockState extends State<DigitalClock>
 
   @override
   Widget build(BuildContext context) {
-    if ( widget.sizeChange) {
+    if (widget.sizeChange) {
       initScale();
     }
     if(widget.config.skinName.compareTo(currentSkinName) != 0 ){

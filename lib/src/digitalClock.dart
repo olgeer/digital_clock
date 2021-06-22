@@ -55,7 +55,7 @@ class DigitalClockState extends State<DigitalClock>
   @override
   void initState() {
     super.initState();
-    initScale();
+    // initScale();
     init();
     if (widget.config.blinkColor != null) initAnimate();
     tiktok();
@@ -105,6 +105,8 @@ class DigitalClockState extends State<DigitalClock>
   }
 
   void init() {
+    initScale();
+
     currentSkinName = widget.config.skinName;
 
     skinBasePath = widget.config.skinBasePath;
@@ -163,7 +165,7 @@ class DigitalClockState extends State<DigitalClock>
 
     // Wakelock.enable();
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
-
+    setState(() {});
   }
 
   void refreshTime(DateTime now) {
@@ -778,7 +780,7 @@ class DigitalClockState extends State<DigitalClock>
     //   initScale();
     // }
     if(widget.config.skinName.compareTo(currentSkinName) != 0 ||widget.sizeChange){
-      initScale();
+      // initScale();
       init();
     }
     return Container(

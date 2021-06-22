@@ -148,6 +148,7 @@ class DigitalClockState extends State<DigitalClock>
 
     // Wakelock.enable();
     SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+    widget.sizeChange=false;
   }
 
   void refreshTime(DateTime now) {

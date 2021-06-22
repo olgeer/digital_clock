@@ -55,6 +55,7 @@ class DigitalClockState extends State<DigitalClock>
   @override
   void initState() {
     super.initState();
+    initScale();
     init();
     if (widget.config.blinkColor != null) initAnimate();
     tiktok();
@@ -94,13 +95,16 @@ class DigitalClockState extends State<DigitalClock>
     // animationController.forward();
   }
 
-  void init() {
-    currentSkinName = widget.config.skinName;
+  void initScale(){
     xScale = widget.width / widget.config.width;
     yScale = widget.height / widget.config.height;
     scale = xScale < yScale ? xScale : yScale;
     logger.fine("widget.width=${widget.width} widget.height=${widget.height}");
     logger.fine("xs=$xScale ys=$yScale scale=$scale");
+  }
+
+  void init() {
+    currentSkinName = widget.config.skinName;
 
     skinBasePath = widget.config.skinBasePath;
 
@@ -760,7 +764,7 @@ class DigitalClockState extends State<DigitalClock>
   @override
   Widget build(BuildContext context) {
     if (widget.config.skinName.compareTo(currentSkinName) != 0 || widget.sizeChange) {
-      init();
+      initScale();
     }
     return Container(
         height: widget.height,

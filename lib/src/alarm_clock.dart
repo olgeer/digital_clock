@@ -250,7 +250,7 @@ class AlarmClock {
     }
 
     //按休眠计划改变激活锁定状态
-    if (sleepSchedule?.match(now) == false) {
+    if ((sleepSchedule?.match(now)??false) == false) {
       // if (sleepDisableAction != null) sleepDisableAction();
       sleepDisableAction?.call();
     } else {

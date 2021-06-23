@@ -105,7 +105,7 @@ class AlarmClock {
   }
 
   void setSleepState(){
-    if (sleepSchedule?.match(DateTime.now()) == false) {
+    if ((sleepSchedule?.match(DateTime.now())??false) == false) {
       logger.fine("do wakelock");
       // if (sleepDisableAction != null) sleepDisableAction();
       sleepDisableAction?.call();
@@ -227,7 +227,7 @@ class AlarmClock {
       case 30:
         alertTime = halfPastTemplate.tl(args: [now.hour.toString()]);
         if (halfSoundIdx != null)
-          playSound(halfSoundIdx, repeat: true, duration: Duration(seconds: 3));
+          playSound(halfSoundIdx, repeat: true, duration: Duration(seconds: 2));
         intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
         Vibrate.mediumVibrate();
         break;
@@ -235,7 +235,7 @@ class AlarmClock {
         alertTime = oclockTemplate.tl(args: [now.hour.toString()]);
         if (oclockSoundIdx != null)
           playSound(oclockSoundIdx,
-              repeat: true, duration: Duration(seconds: 4));
+              repeat: true, duration: Duration(seconds: 3));
         intervalAction(FlashLamp.flash,
             millisecondInterval: [300, 1300, 1600, 3300, 3600, 4300, 4600]);
         Vibrate.longVibrate();

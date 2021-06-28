@@ -223,7 +223,7 @@ class DigitalClockState extends State<DigitalClock>
           millisecondInterval: [300, 1300, 1600, 2300, 3600]);
     }
     if (now.minute != minutes && minuteFlipNumber != null) {
-      logger.fine("minuteFlipNumber flip !");
+      logger.finest("minuteFlipNumber flip !");
       minuteFlipNumber.currentValue = now.minute;
       minuteFlipNumber?.controller?.forward();
       if (now.minute == 30) {

@@ -892,8 +892,8 @@ class ItemConfig {
     return json.decode(itemJsonStr);
   }
 
-  static ItemConfig fromJson(Map<String, dynamic> j) {
-    // if (j == null) return null;
+  static ItemConfig? fromJson(Map<String, dynamic>? j) {
+    if (j == null) return null;
     return ItemConfig(
         style: j["style"],
         rect: json2Rect(j["rect"]),

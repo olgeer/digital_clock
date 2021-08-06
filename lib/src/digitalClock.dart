@@ -896,12 +896,12 @@ class ItemConfig {
     if (j == null) return null;
     return ItemConfig(
         style: j["style"],
-        rect: json2Rect(j["rect"]),
+        rect: json2Rect(j["rect"]) ?? Rect.fromLTRB(-10, -10, 10, 10),
         // imgs: objectListToStringList(j["imgs"]),
         imgs: j["imgs"] == null ? null : List.castFrom(j["imgs"]),
         imgPrename: j["imgPrename"],
         imgExtname: j["imgExtname"],
-        textStyle: json2TextStyle(j["textStyle"]));
+        textStyle: json2TextStyle(j["textStyle"]) ?? TextStyle(fontSize: 12));
   }
 
   @override
@@ -918,8 +918,8 @@ class ItemConfig {
     };
   }
 
-  Map<String, dynamic> textStyle2Json(TextStyle ts) {
-    // if (ts == null) return null;
+  Map<String, dynamic>? textStyle2Json(TextStyle? ts) {
+    if (ts == null) return null;
     return {
       "fontSize": ts.fontSize,
       "color": ts.color?.value,
@@ -927,16 +927,16 @@ class ItemConfig {
     };
   }
 
-  static TextStyle json2TextStyle(Map<String, dynamic> jts) {
-    // if (jts == null) return null;
+  static TextStyle? json2TextStyle(Map<String, dynamic>? jts) {
+    if (jts == null) return null;
     return TextStyle(
         fontSize: jts["fontSize"] ?? 12,
         color: Color(jts["color"] ?? 0x00000000),
         fontFamily: jts["fontFamily"]);
   }
 
-  Map<String, double> rect2Json(Rect rect) {
-    // if (rect == null) return null;
+  Map<String, double>? rect2Json(Rect? rect) {
+    if (rect == null) return null;
     return {
       "left": rect.left,
       "top": rect.top,
@@ -945,8 +945,8 @@ class ItemConfig {
     };
   }
 
-  static Rect json2Rect(Map<String, dynamic> jRect) {
-    // if (jRect == null) return null;
+  static Rect? json2Rect(Map<String, dynamic>? jRect) {
+    if (jRect == null) return null;
     return Rect.fromLTRB(
         jRect["left"], jRect["top"], jRect["right"], jRect["bottom"]);
   }

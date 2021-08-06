@@ -10,12 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  logging: ^1.0.0
-  wakelock: ^0.5.2
-  vibration: ^1.7.4-nullsafety.0
-  cron: ^0.3.0
+  logging: ^1.0.1
+  wakelock: ^0.5.3+3
+  vibration: ^1.7.3
+  cron: ^0.3.1
   soundpool: ^2.1.0
-  fluttertoast: ^8.0.7
+  fluttertoast: ^8.0.8
   phone_lamp:
     git:
       url: https://github.com/olgeer/phone_lamp.git

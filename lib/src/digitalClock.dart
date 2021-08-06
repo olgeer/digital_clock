@@ -1,11 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'flipNumber.dart';
-import 'define.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:logging/logging.dart';
+
+import 'define.dart';
+import 'flipNumber.dart';
 
 typedef contextProc = void Function(BuildContext context);
 
@@ -14,14 +16,14 @@ class DigitalClock extends StatefulWidget {
   double width;
   bool sizeChange;
   DigitalClockConfig config;
-  eventCall onClockEvent;
-  contextProc onExitAction;
+  eventCall? onClockEvent;
+  contextProc? onExitAction;
 
   DigitalClock({
     this.height = 300,
     this.width = 600,
     this.sizeChange = false,
-    @required this.config,
+    required this.config,
     this.onClockEvent,
     this.onExitAction,
   })  : assert(config != null),
@@ -31,25 +33,24 @@ class DigitalClock extends StatefulWidget {
   State<StatefulWidget> createState() => DigitalClockState();
 
   void fireClockEvent(ClockEvent ce) =>
-      onClockEvent != null ? onClockEvent(ce) : null;
-
+      onClockEvent != null ? onClockEvent!(ce) : null;
 }
 
 class DigitalClockState extends State<DigitalClock>
     with SingleTickerProviderStateMixin {
-  int hours, minutes, years, months, days, weekday;
+  late int hours, minutes, years, months, days, weekday;
   int h12 = 0, tk = 0;
   bool isSlient = false;
-  String currentSkinName;
-  String skinBasePath;
-  Timer clockTimer;
+  late String currentSkinName;
+  late String skinBasePath;
+  late Timer clockTimer;
   double scale = 1;
   Widget nullWidget = Container();
-  FlipNumber hourFlipNumber, minuteFlipNumber;
-  Duration animationDuration;
-  double xScale, yScale;
-  AnimationController animationController;
-  Animation<Color> animation;
+  FlipNumber? hourFlipNumber, minuteFlipNumber;
+  late Duration animationDuration;
+  late double xScale, yScale;
+  AnimationController? animationController;
+  Animation<Color>? animation;
   Logger logger = Logger("DigitalClock");
 
   @override
@@ -80,16 +81,16 @@ class DigitalClockState extends State<DigitalClock>
 
     animation = ColorTween(
             begin: widget.config.backgroundColor, end: widget.config.blinkColor)
-        .animate(animationController);
-    animationController.addStatusListener((status) {
+        .animate(animationController!) as Animation<Color>?;
+    animationController?.addStatusListener((status) {
       logger.finer("Animation state = ${status.toString()}");
       if (status == AnimationStatus.completed)
         Future.delayed(
-            Duration(milliseconds: 100), () => animationController.reverse());
+            Duration(milliseconds: 100), () => animationController?.reverse());
     });
-    animationController.addListener(() {
+    animationController?.addListener(() {
       setState(() {
-        logger.finest(animation.value);
+        logger.finest(animation?.value);
       });
     });
     // animationController.forward();
@@ -109,18 +110,18 @@ class DigitalClockState extends State<DigitalClock>
 
     currentSkinName = widget.config.skinName;
 
-    skinBasePath = widget.config.skinBasePath;
+    skinBasePath = widget.config.skinBasePath ?? "";
 
     animationDuration = Duration(milliseconds: 2300);
 
     refreshTime(DateTime.now());
 
     if (widget.config.hourItem?.style == TimeStyle.flip.index) {
-      if(hourFlipNumber==null) {
+      if (hourFlipNumber == null && widget.config.hourItem != null) {
         hourFlipNumber = FlipNumber(
           scale: scale,
           basePath: skinBasePath,
-          numberItem: widget.config.hourItem,
+          numberItem: widget.config.hourItem!,
           animationDuration: animationDuration,
           canRevese: false,
           isPositiveSequence: true,
@@ -128,10 +129,10 @@ class DigitalClockState extends State<DigitalClock>
           max: widget.config.timeType == TimeType.h12 ? 12 : 23,
           currentValue: hours,
         );
-      }else{
-        hourFlipNumber.scale=scale;
-        hourFlipNumber.currentValue=hours;
-        hourFlipNumber.refresh();
+      }else {
+        hourFlipNumber?.scale = scale;
+        hourFlipNumber?.currentValue = hours;
+        hourFlipNumber?.refresh();
       }
     } else {
       if (hourFlipNumber != null) {
@@ -141,11 +142,11 @@ class DigitalClockState extends State<DigitalClock>
     }
 
     if (widget.config.minuteItem?.style == TimeStyle.flip.index) {
-      if(minuteFlipNumber==null) {
+      if (minuteFlipNumber == null && widget.config.minuteItem != null) {
         minuteFlipNumber = FlipNumber(
           scale: scale,
           basePath: skinBasePath,
-          numberItem: widget.config.minuteItem,
+          numberItem: widget.config.minuteItem!,
           animationDuration: animationDuration,
           canRevese: false,
           isPositiveSequence: true,
@@ -153,10 +154,10 @@ class DigitalClockState extends State<DigitalClock>
           max: 59,
           currentValue: minutes,
         );
-      }else{
-        minuteFlipNumber.scale=scale;
-        minuteFlipNumber.currentValue=minutes;
-        minuteFlipNumber.refresh();
+      }else {
+        minuteFlipNumber?.scale = scale;
+        minuteFlipNumber?.currentValue = minutes;
+        minuteFlipNumber?.refresh();
       }
     } else {
       if (minuteFlipNumber != null) {
@@ -200,37 +201,25 @@ class DigitalClockState extends State<DigitalClock>
     return s;
   }
 
-  ///按一定时间间隔重复执行processer方法，方法调用后立即执行processer方法，如millisecondInterval不为null则按此间隔继续执行
-  void intervalAction(actionCall processer, {List<int> millisecondInterval}) {
-    if (processer != null) {
-      processer();
-      if (millisecondInterval?.isNotEmpty == true) {
-        for (int i in millisecondInterval) {
-          Future.delayed(Duration(milliseconds: i), processer);
-        }
-      }
-    }
-  }
-
   void tiktok() {
     DateTime now = DateTime.now();
     // if(animationController==null||animationController?.status==AnimationStatus.dismissed)animationController?.forward();
     logger.finest("Tiktok running $now");
     if (getHour(now.hour) != hours && hourFlipNumber != null) {
-      hourFlipNumber.currentValue = getHour(now.hour);
+      hourFlipNumber?.currentValue = getHour(now.hour);
       hourFlipNumber?.controller?.forward();
-      intervalAction(animationController?.forward,
+      intervalAction(() => animationController?.forward,
           millisecondInterval: [300, 1300, 1600, 2300, 3600]);
     }
     if (now.minute != minutes && minuteFlipNumber != null) {
       logger.finest("minuteFlipNumber flip !");
-      minuteFlipNumber.currentValue = now.minute;
+      minuteFlipNumber?.currentValue = now.minute;
       minuteFlipNumber?.controller?.forward();
       if (now.minute == 30) {
-        intervalAction(animationController?.forward,
+        intervalAction(() => animationController?.forward,
             millisecondInterval: [300, 1300, 1600]);
       } else if (now.minute == 15 || now.minute == 45) {
-        intervalAction(animationController?.forward,
+        intervalAction(() => animationController?.forward,
             millisecondInterval: [300]);
       }
       // else
@@ -256,8 +245,8 @@ class DigitalClockState extends State<DigitalClock>
 
   Widget buildTextItem(
       String itemText, Rect itemRect, TextStyle itemTextStyle) {
-    TextStyle scaleTextStyle =
-        itemTextStyle.copyWith(fontSize: itemTextStyle.fontSize * scale);
+    TextStyle scaleTextStyle = itemTextStyle.copyWith(
+        fontSize: (itemTextStyle?.fontSize ?? 12) * scale);
     return Container(
       // color: Colors.white12,
       height: widget.config.height * scale,
@@ -286,9 +275,9 @@ class DigitalClockState extends State<DigitalClock>
   Widget buildPicItem(int value, ItemConfig picItem) {
     String picName;
     if (picItem.imgs != null &&
-        picItem.imgs.isNotEmpty &&
-        value < picItem.imgs.length) {
-      picName = widget.config.skinBasePath + picItem.imgs[value];
+        picItem.imgs!.isNotEmpty &&
+        value < picItem.imgs!.length) {
+      picName = "${widget.config.skinBasePath}${picItem.imgs![value]}";
     } else {
       picName =
           "${widget.config.skinBasePath}${picItem.imgPrename ?? ""}${int2Str(value)}${picItem.imgExtname ?? ""}";
@@ -324,7 +313,7 @@ class DigitalClockState extends State<DigitalClock>
     );
   }
 
-  Widget buildYear(int y, ItemConfig ic) {
+  Widget buildYear(int y, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     Widget retWidget;
 
@@ -343,12 +332,14 @@ class DigitalClockState extends State<DigitalClock>
         retWidget = buildTextItem(int2Str(y, width: 4), ic.rect, ic.textStyle);
         break;
       case DateStyle.pic:
+      default:
+        retWidget = nullWidget;
         break;
     }
     return retWidget;
   }
 
-  Widget buildMonth(int m, ItemConfig ic) {
+  Widget buildMonth(int m, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     final chsMonths = [
       "一月",
@@ -407,12 +398,14 @@ class DigitalClockState extends State<DigitalClock>
         retWidget = buildTextItem(shortEngMonths[m - 1], ic.rect, ic.textStyle);
         break;
       case DateStyle.pic:
+      default:
+        retWidget = nullWidget;
         break;
     }
     return retWidget;
   }
 
-  Widget buildDay(int d, ItemConfig ic) {
+  Widget buildDay(int d, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     final chsDays = [
       "一日",
@@ -462,12 +455,14 @@ class DigitalClockState extends State<DigitalClock>
         retWidget = buildTextItem(int2Str(d), ic.rect, ic.textStyle);
         break;
       case DateStyle.pic:
+      default:
+        retWidget = nullWidget;
         break;
     }
     return retWidget;
   }
 
-  Widget buildWeekDay(int wd, ItemConfig ic) {
+  Widget buildWeekDay(int wd, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     final chsWeekDays = [
       "星期日",
@@ -504,12 +499,14 @@ class DigitalClockState extends State<DigitalClock>
         retWidget = buildTextItem(shortEngWeekDays[wd], ic.rect, ic.textStyle);
         break;
       case DateStyle.pic:
+      default:
+        retWidget = nullWidget;
         break;
     }
     return retWidget;
   }
 
-  Widget buildHour(int h, ItemConfig ic) {
+  Widget buildHour(int h, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     Widget retWidget;
     switch (TimeStyle.values[ic.style]) {
@@ -526,11 +523,14 @@ class DigitalClockState extends State<DigitalClock>
       case TimeStyle.flip:
         retWidget = buildHourFlipItem(h, ic, skinBasePath);
         break;
+      default:
+        retWidget = nullWidget;
+        break;
     }
     return retWidget;
   }
 
-  Widget buildMinute(int m, ItemConfig ic) {
+  Widget buildMinute(int m, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     Widget retWidget;
     switch (TimeStyle.values[ic.style]) {
@@ -547,59 +547,67 @@ class DigitalClockState extends State<DigitalClock>
       case TimeStyle.flip:
         retWidget = buildMinuteFlipItem(m, ic, skinBasePath);
         break;
+      default:
+        retWidget = nullWidget;
+        break;
     }
     return retWidget;
   }
 
-  Widget buildTiktok(int t, ItemConfig ic) {
+  Widget buildTiktok(int t, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     Widget retWidget;
     switch (TikTokStyle.values[ic.style]) {
       case TikTokStyle.text:
         retWidget = buildTextItem(t == 0 ? "" : ":", ic.rect, ic.textStyle);
         break;
-      case TikTokStyle.icon:
-        break;
       case TikTokStyle.pic:
         retWidget = buildPicItem(t, ic);
+        break;
+      case TikTokStyle.icon:
+      default:
+        retWidget = nullWidget;
         break;
     }
     return retWidget;
   }
 
-  Widget buildH12(int f, ItemConfig ic) {
+  Widget buildH12(int f, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     Widget retWidget;
     switch (H12Style.values[ic.style]) {
       case H12Style.text:
         retWidget = buildTextItem(f == 0 ? "AM" : "PM", ic.rect, ic.textStyle);
         break;
-      case H12Style.icon:
-        break;
       case H12Style.pic:
         retWidget = buildPicItem(f, ic);
+        break;
+      case H12Style.icon:
+      default:
+        retWidget = nullWidget;
         break;
     }
     return retWidget;
   }
 
-  Widget buildBackgroundImage(String bgImage) {
+  Widget buildBackgroundImage(String? bgImage) {
     if (bgImage == null) return nullWidget;
     return Container(
       height: widget.height,
       width: widget.width,
-      child: buildImage(widget.config.skinBasePath + bgImage, fit: BoxFit.fill),
+      child:
+          buildImage("${widget.config.skinBasePath}$bgImage", fit: BoxFit.fill),
     );
   }
 
-  Widget buildBodyImage(ItemConfig bodyImage) {
+  Widget buildBodyImage(ItemConfig? bodyImage) {
     if (bodyImage == null) return nullWidget;
 
-    String picName;
+    String picName = "";
     if (bodyImage.imgs != null &&
-        bodyImage.imgs.isNotEmpty &&
-        bodyImage.imgs.length > 0) {
-      picName = "${widget.config.skinBasePath}${bodyImage.imgs.first}";
+        bodyImage.imgs!.isNotEmpty &&
+        bodyImage.imgs!.length > 0) {
+      picName = "${widget.config.skinBasePath}${bodyImage.imgs!.first}";
     }
     return Container(
       height: widget.height * scale,
@@ -613,12 +621,12 @@ class DigitalClockState extends State<DigitalClock>
     );
   }
 
-  Widget buildExitControl(ItemConfig exitItem) {
+  Widget buildExitControl(ItemConfig? exitItem) {
     if (exitItem == null) return nullWidget;
 
-    String picName;
-    if (exitItem.imgs != null && exitItem.imgs.length > 0) {
-      picName = "${widget.config.skinBasePath}${exitItem.imgs.first}";
+    String picName = "";
+    if (exitItem.imgs != null && exitItem.imgs!.length > 0) {
+      picName = "${widget.config.skinBasePath}${exitItem.imgs!.first}";
     }
     if (exitItem.imgPrename != null || exitItem.imgExtname != null) {
       picName =
@@ -629,7 +637,7 @@ class DigitalClockState extends State<DigitalClock>
       onTap: () {
         widget.fireClockEvent(ClockEvent(ClockEventType.exit, value: context));
         if (widget.onExitAction != null)
-          widget.onExitAction(context);
+          widget.onExitAction!(context);
         else {
           showDialog(
               context: context,
@@ -669,15 +677,15 @@ class DigitalClockState extends State<DigitalClock>
     );
   }
 
-  Widget buildSettingControl(ItemConfig settingItem, String basePath) {
+  Widget buildSettingControl(ItemConfig? settingItem, String basePath) {
     if (settingItem == null) return nullWidget;
 
-    String picName;
+    String picName = "";
     if (settingItem.style == ActionStyle.pic.index) {
       if (settingItem.imgs != null &&
-          settingItem.imgs.isNotEmpty &&
-          settingItem.imgs.length > 0) {
-        picName = basePath ?? "" + settingItem.imgs.first;
+          settingItem.imgs!.isNotEmpty &&
+          settingItem.imgs!.length > 0) {
+        picName = basePath ?? "" + settingItem.imgs!.first;
       }
       if (settingItem.imgPrename != null || settingItem.imgExtname != null) {
         picName =
@@ -686,9 +694,9 @@ class DigitalClockState extends State<DigitalClock>
     }
     if (settingItem.style == ActionStyle.icon.index) {
       if (settingItem.imgs != null &&
-          settingItem.imgs.isNotEmpty &&
-          settingItem.imgs.length > 0) {
-        picName = settingItem.imgs.first;
+          settingItem.imgs!.isNotEmpty &&
+          settingItem.imgs!.length > 0) {
+        picName = settingItem.imgs!.first;
       }
     }
     // print("skinRect:${skinItem.rect}");
@@ -717,16 +725,16 @@ class DigitalClockState extends State<DigitalClock>
     );
   }
 
-  Widget buildSlientControl(ItemConfig slientItem, String basePath) {
+  Widget buildSlientControl(ItemConfig? slientItem, String basePath) {
     if (slientItem == null) return nullWidget;
 
-    String picName;
+    String picName = "";
     if (slientItem.style == ActionStyle.pic.index) {
-      if (slientItem.imgs != null && slientItem.imgs.length > 1) {
+      if (slientItem.imgs != null && slientItem.imgs!.length > 1) {
         if (isSlient)
-          picName = basePath ?? "" + slientItem.imgs[0];
+          picName = "${basePath ?? ""}${slientItem.imgs![0]}";
         else
-          picName = basePath ?? "" + slientItem.imgs[1];
+          picName = "${basePath ?? ""}${slientItem.imgs![1]}";
       }
       if (slientItem.imgPrename != null || slientItem.imgExtname != null) {
         if (isSlient)
@@ -738,11 +746,11 @@ class DigitalClockState extends State<DigitalClock>
       }
     }
     if (slientItem.style == ActionStyle.icon.index) {
-      if (slientItem.imgs != null && slientItem.imgs.length > 1) {
+      if (slientItem.imgs != null && slientItem.imgs!.length > 1) {
         if (isSlient)
-          picName = slientItem.imgs[0];
+          picName = slientItem.imgs![0];
         else
-          picName = slientItem.imgs[1];
+          picName = slientItem.imgs![1];
       }
     }
     // print("skinRect:${skinItem.rect}");
@@ -758,12 +766,12 @@ class DigitalClockState extends State<DigitalClock>
         width: widget.config.width * scale,
         margin: buildEdgeRect(slientItem.rect),
         alignment: Alignment.center,
-        child: slientItem.style == ActionStyle.pic.index && picName != null
+        child: slientItem.style == ActionStyle.pic.index
             ? buildImage(
                 picName,
                 fit: BoxFit.cover,
               )
-            : slientItem.style == ActionStyle.icon.index && picName != null
+            : slientItem.style == ActionStyle.icon.index
                 ? Icon(
                     new IconData(int.parse(picName),
                         fontFamily: "MaterialIcons"),
@@ -825,14 +833,14 @@ class DigitalClockState extends State<DigitalClock>
 
             ///skin
             buildSettingControl(
-                widget.config.settingItem, widget.config.skinBasePath),
+                widget.config.settingItem, widget.config.skinBasePath ?? ""),
 
             ///exit
             buildExitControl(widget.config.exitItem),
 
             ///slient
             buildSlientControl(
-                widget.config.slientItem, widget.config.skinBasePath),
+                widget.config.slientItem, widget.config.skinBasePath ?? ""),
           ],
         ));
   }
@@ -865,20 +873,19 @@ class ClockEvent {
 class ItemConfig {
   int style; //样式的index值，根据item的不同有不同的对应关系
   Rect rect; //item的作用范围，采用中心坐标
-  List<String> imgs; //优先使用imgs，如果imgs为null，则检测imgPrename和imgExtname;
-  String imgPrename; //系列图片的前缀，如 hour00.png 中的 "hour"
-  String imgExtname; //系列图片的后缀，如 hour00.png 中的 ".png"
+  List<String>? imgs; //优先使用imgs，如果imgs为null，则检测imgPrename和imgExtname;
+  String? imgPrename; //系列图片的前缀，如 hour00.png 中的 "hour"
+  String? imgExtname; //系列图片的后缀，如 hour00.png 中的 ".png"
   TextStyle textStyle; //文本显示样式，当item样式为文本时有效，其余忽略
 
   ItemConfig({
-    this.style,
-    this.rect,
+    required this.style,
+    required this.rect,
     this.imgs,
     this.imgPrename,
     this.imgExtname,
-    this.textStyle,
-  })  : assert(style != null),
-        assert(rect != null);
+    this.textStyle = const TextStyle(fontSize: 12),
+  });
 
   static ItemConfig fromString(String itemJsonStr) {
     print(itemJsonStr);
@@ -886,7 +893,7 @@ class ItemConfig {
   }
 
   static ItemConfig fromJson(Map<String, dynamic> j) {
-    if (j == null) return null;
+    // if (j == null) return null;
     return ItemConfig(
         style: j["style"],
         rect: json2Rect(j["rect"]),
@@ -912,16 +919,16 @@ class ItemConfig {
   }
 
   Map<String, dynamic> textStyle2Json(TextStyle ts) {
-    if (ts == null) return null;
+    // if (ts == null) return null;
     return {
-      "fontSize": ts?.fontSize,
-      "color": ts?.color?.value,
-      "fontFamily": ts?.fontFamily,
+      "fontSize": ts.fontSize,
+      "color": ts.color?.value,
+      "fontFamily": ts.fontFamily,
     };
   }
 
   static TextStyle json2TextStyle(Map<String, dynamic> jts) {
-    if (jts == null) return null;
+    // if (jts == null) return null;
     return TextStyle(
         fontSize: jts["fontSize"] ?? 12,
         color: Color(jts["color"] ?? 0x00000000),
@@ -929,7 +936,7 @@ class ItemConfig {
   }
 
   Map<String, double> rect2Json(Rect rect) {
-    if (rect == null) return null;
+    // if (rect == null) return null;
     return {
       "left": rect.left,
       "top": rect.top,
@@ -939,7 +946,7 @@ class ItemConfig {
   }
 
   static Rect json2Rect(Map<String, dynamic> jRect) {
-    if (jRect == null) return null;
+    // if (jRect == null) return null;
     return Rect.fromLTRB(
         jRect["left"], jRect["top"], jRect["right"], jRect["bottom"]);
   }
@@ -949,33 +956,29 @@ class DigitalClockConfig {
   static bool debugMode = true;
 
   String skinName;
-  String skinBasePath;
+  String? skinBasePath;
 
   ///日期相关设置
-  ItemConfig yearItem;
-  ItemConfig monthItem;
-  ItemConfig dayItem;
-  ItemConfig weekdayItem;
+  ItemConfig? yearItem, monthItem, dayItem, weekdayItem;
 
   ///时间相关设置
-  ItemConfig hourItem;
-  ItemConfig minuteItem;
+  ItemConfig? hourItem, minuteItem;
 
   ///12小时模式相关设置
   TimeType timeType;
-  ItemConfig h12Item;
+  ItemConfig? h12Item;
 
   ///秒动态设置
-  ItemConfig tiktokItem;
+  ItemConfig? tiktokItem;
 
   ///皮肤切换控制
-  ItemConfig settingItem;
+  ItemConfig? settingItem;
 
   ///返回/退出控制
-  ItemConfig exitItem;
+  ItemConfig? exitItem;
 
   ///静音控制
-  ItemConfig slientItem;
+  ItemConfig? slientItem;
 
   ///背景设置
   Color backgroundColor;
@@ -984,13 +987,13 @@ class DigitalClockConfig {
   Color blinkColor;
 
   ///背景图片
-  String backgroundImage;
+  String? backgroundImage;
 
   ///主题颜色
   Color foregroundColor;
 
   ///主体图片
-  ItemConfig bodyImage;
+  ItemConfig? bodyImage;
 
   ///控件基本设置
   double height;
@@ -1002,7 +1005,7 @@ class DigitalClockConfig {
       this.monthItem,
       this.dayItem,
       this.weekdayItem,
-      this.timeType,
+      this.timeType = TimeType.h24,
       this.hourItem,
       this.minuteItem,
       this.h12Item,
@@ -1010,21 +1013,21 @@ class DigitalClockConfig {
       this.settingItem,
       this.exitItem,
       this.slientItem,
-      this.backgroundColor,
-      this.blinkColor,
+      this.backgroundColor = Colors.black,
+      this.blinkColor = Colors.white,
       this.backgroundImage,
-      this.foregroundColor,
+      this.foregroundColor = Colors.white,
       this.bodyImage,
-      this.height,
-      this.width});
+      this.height = 100,
+      this.width = 200});
 
-  static DigitalClockConfig fromFile(File configFile) {
+  static DigitalClockConfig? fromFile(File configFile) {
     if (configFile == null || !configFile.existsSync()) return null;
     return fromJson(configFile.readAsStringSync());
   }
 
   static DigitalClockConfig fromJson(String jsonStr) {
-    if (jsonStr == null) return null;
+    // if (jsonStr == null) return null;
 
     var jMap = jsonDecode(jsonStr);
     return DigitalClockConfig(
@@ -1042,7 +1045,8 @@ class DigitalClockConfig {
       exitItem: ItemConfig.fromJson(jMap["exitItem"]),
       slientItem: ItemConfig.fromJson(jMap["slientItem"]),
       backgroundColor: Color(jMap["backgroundColor"] ?? 0x00000000),
-      blinkColor: jMap["blinkColor"] == null ? null : Color(jMap["blinkColor"]),
+      blinkColor:
+          jMap["blinkColor"] == null ? Colors.white : Color(jMap["blinkColor"]),
       foregroundColor: Color(jMap["foregroundColor"] ?? 0x00ffffff),
       backgroundImage: jMap["backgroundImage"],
       bodyImage: ItemConfig.fromJson(jMap["bodyImage"]),

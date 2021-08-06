@@ -2,7 +2,7 @@ import 'package:flutter/services.dart';
 import 'package:soundpool/soundpool.dart';
 
 class Sound {
-  static Soundpool soundpool;
+  static late Soundpool soundpool;
 
   static Future init() async {
     soundpool = Soundpool(
@@ -10,11 +10,12 @@ class Sound {
     );
   }
 
-  static void play(int soundId, {bool repeat = false, Duration duration}) async {
+  static void play(int soundId,
+      {bool repeat = false, Duration? duration}) async {
     ///不允许无限循环并无时长控制，自动修复为只播放一次
     if (repeat && duration == null) repeat = false;
-    int streamId = await soundpool.play(
-        soundId, repeat: (repeat ?? false) ? -1 : 0);
+    int streamId =
+        await soundpool.play(soundId, repeat: (repeat ?? false) ? -1 : 0);
     if (duration != null && repeat && streamId != 0)
       Future.delayed(duration, () => soundpool.stop(streamId));
   }

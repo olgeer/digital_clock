@@ -1,52 +1,53 @@
 import 'dart:io';
 
-import 'define.dart';
+import 'package:cron/cron.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:logging/logging.dart';
-import 'package:cron/cron.dart';
+
+import 'define.dart';
+import 'lamp.dart';
 import 'sound.dart';
 import 'vibrate.dart';
-import 'lamp.dart';
 
 class AlarmClock {
-  Cron cron;
-  ScheduledTask alarmTask;
+  late Cron cron;
+  late ScheduledTask alarmTask;
 
   ///报时计划
-  Schedule alarmSchedule;
-  actionCall alarmAction;
+  late Schedule alarmSchedule;
+  late actionCall alarmAction;
 
   ///免打搅时段，取消报时声音
-  Schedule slientSchedule;
+  Schedule? slientSchedule;
 
   ///允许休眠时段
-  Schedule sleepSchedule;
-  actionCall sleepEnableAction;
-  actionCall sleepDisableAction;
+  Schedule? sleepSchedule;
+  actionCall? sleepEnableAction;
+  actionCall? sleepDisableAction;
 
   ///允许震动开关
-  bool enableVibrate;
+  bool enableVibrate = false;
 
   ///允许报时音开关
-  bool enableAlarmSound;
+  bool enableAlarmSound = false;
 
   ///允许闪光灯开关
-  bool enableFlashLamp;
+  bool enableFlashLamp = false;
 
   ///刻钟报时音文件
-  bool canQuarterAlarm=true;
-  dynamic quarterAlarmSound;
-  int quarterSoundIdx;
+  bool canQuarterAlarm = true;
+  dynamic? quarterAlarmSound;
+  int quarterSoundIdx = 0;
 
   ///半点报时音文件
-  bool canHalfAlarm=true;
-  dynamic halfAlarmSound;
-  int halfSoundIdx;
+  bool canHalfAlarm = true;
+  dynamic? halfAlarmSound;
+  int halfSoundIdx = 0;
 
   ///整点报时音文件
-  bool canHourAlarm=true;
-  dynamic hourAlarmSound;
-  int oclockSoundIdx;
+  bool canHourAlarm = true;
+  dynamic? hourAlarmSound;
+  int oclockSoundIdx = 0;
 
   ///静音开关
   bool isSlient = false;
@@ -64,7 +65,7 @@ class AlarmClock {
 
   AlarmClock(
       {dynamic newSchedule,
-      actionCall newAlarmAction,
+      actionCall? newAlarmAction,
       dynamic noSoundSchedule,
       dynamic noWakeLockSchedule,
       this.sleepEnableAction,
@@ -148,22 +149,23 @@ class AlarmClock {
 
   set setSlient(bool b) {
     isSlient = b;
-    FlashLamp.useLamp=!b;
-    Vibrate.enableVibrate=!b;
+    FlashLamp.useLamp = !b;
+    Vibrate.enableVibrate = !b;
     logger.fine("isSlient is $b");
   }
 
   Schedule get newSchedule => alarmSchedule;
 
-  set noSoundSchedule(Schedule s) => slientSchedule = s;
-  Schedule get noSoundSchedule => slientSchedule;
+  set noSoundSchedule(Schedule? s) => slientSchedule = s;
 
-  set noWakeLockSchedule(Schedule s) {
+  Schedule? get noSoundSchedule => slientSchedule;
+
+  set noWakeLockSchedule(Schedule? s) {
     sleepSchedule = s;
     setSleepState();
   }
 
-  Schedule get noWakeLockSchedule => sleepSchedule;
+  Schedule? get noWakeLockSchedule => sleepSchedule;
 
   String get alarmTemplate {
     String alarmTmp = normalAlarmMessageTemplate;
@@ -196,11 +198,12 @@ class AlarmClock {
     alarmTask.cancel();
   }
 
-  void playSound(int soundIdx, {bool repeat, Duration duration}) {
+  void playSound(int soundIdx,
+      {bool repeat = false,
+      Duration duration = const Duration(milliseconds: 500)}) {
     //仅设定时间段内报时
     if (!(slientSchedule?.match(DateTime.now()) ?? false) && !isSlient) {
-      Sound.play(soundIdx,
-          repeat: repeat ?? duration != null, duration: duration);
+      Sound.play(soundIdx, repeat: repeat, duration: duration);
     }
   }
 
@@ -279,18 +282,6 @@ class AlarmClock {
       );
     }
     if (debugMode) logger.fine(msg);
-  }
-
-  ///按一定时间间隔重复执行processer方法，方法调用后立即执行processer方法，如millisecondInterval不为null则按此间隔继续执行
-  void intervalAction(actionCall processer, {List<int> millisecondInterval}) {
-    if (processer != null) {
-      processer();
-      if (millisecondInterval?.isNotEmpty == true) {
-        for (int i in millisecondInterval) {
-          Future.delayed(Duration(milliseconds: i), processer);
-        }
-      }
-    }
   }
 }
 

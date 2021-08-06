@@ -19,11 +19,23 @@ extension MatchExtension on Schedule {
 }
 
 extension TranslateExtension on String {
-  String tl({List<String> args}) {
+  String tl({List<String>? args}) {
     String tmp = this;
     while (tmp.contains("{}") && !(args?.isEmpty ?? true)) {
-      tmp = tmp.replaceFirst("{}", args.removeAt(0));
+      tmp = tmp.replaceFirst("{}", args!.removeAt(0));
     }
     return tmp;
+  }
+}
+
+///按一定时间间隔重复执行processer方法，方法调用后立即执行processer方法，如millisecondInterval不为null则按此间隔继续执行
+void intervalAction(actionCall processer, {List<int>? millisecondInterval}) {
+  if (processer != null) {
+    processer();
+    if ((millisecondInterval?.isNotEmpty ?? false) == true) {
+      for (int i in millisecondInterval!) {
+        Future.delayed(Duration(milliseconds: i), processer);
+      }
+    }
   }
 }

@@ -1,7 +1,9 @@
 import 'dart:io';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:logging/logging.dart';
+
 import 'digitalClock.dart';
 
 class FlipNumber extends StatefulWidget {
@@ -10,21 +12,21 @@ class FlipNumber extends StatefulWidget {
   double scale;
   final Duration animationDuration;
   final int min, max;
-  int currentValue;
+  int? currentValue;
   final bool canRevese, isPositiveSequence;
-  AnimationController controller;
-  void Function() refresh;
+  late AnimationController controller;
+  late void Function() refresh;
 
   FlipNumber({
-    @required this.numberItem,
-    @required this.basePath,
+    required this.numberItem,
+    required this.basePath,
     this.scale = 1.0,
     this.animationDuration = const Duration(milliseconds: 2000),
     this.min = 0,
     this.max = 23,
     this.canRevese = true,
     this.isPositiveSequence = true,
-    this.currentValue = 0,
+    this.currentValue,
   });
 
   @override
@@ -36,21 +38,26 @@ class FlipNumber extends StatefulWidget {
 class _FlipNumberState extends State<FlipNumber>
     with SingleTickerProviderStateMixin {
   // 动画总控制器
-  AnimationController _controller;
+  late AnimationController _controller;
+
   // 上数字 动画
-  Animation<double> _upAnimation;
+  late Animation<double> _upAnimation;
+
   // 下数字 动画
-  Animation<double> _downAnimation;
+  late Animation<double> _downAnimation;
+
   // 是否正序
-  bool _isPositiveSequence;
+  late bool _isPositiveSequence;
+
   // 当前数值
-  int _currentIndex;
+  late int _currentIndex;
+
   // 下一个数值
-  int _nextIndex;
+  late int _nextIndex;
 
   Logger logger = Logger("FlipNumber");
 
-  void refresh(){
+  void refresh() {
     setState(() {});
   }
 
@@ -127,7 +134,7 @@ class _FlipNumberState extends State<FlipNumber>
     super.dispose();
   }
 
-  int calcValue({int initValue}) {
+  int calcValue({int? initValue}) {
     _currentIndex = initValue ?? _nextIndex;
     // 正序则累加，倒序则累减；进行边际控制。
     if (_isPositiveSequence) {
@@ -253,10 +260,10 @@ class Pannel extends StatelessWidget {
   String basePath;
   double scale;
   Pannel({
-    this.value,
-    this.picItem,
-    this.basePath,
-    this.scale,
+    required this.value,
+    required this.picItem,
+    required this.basePath,
+    required this.scale,
   });
 
   Widget buildImage(String picName, {BoxFit fit = BoxFit.cover}) {
@@ -293,7 +300,7 @@ class Pannel extends StatelessWidget {
           int2Str(value),
           style: TextStyle(
             color: Colors.white,
-            fontSize: picItem.textStyle.fontSize * scale,
+            fontSize: picItem.textStyle.fontSize! * scale,
           ),
           textAlign: TextAlign.center,
         ),
@@ -301,9 +308,9 @@ class Pannel extends StatelessWidget {
     }
     String picName;
     if (picItem.imgs != null &&
-        picItem.imgs.isNotEmpty &&
-        value < picItem.imgs.length) {
-      picName = basePath + picItem.imgs[value];
+        picItem.imgs!.isNotEmpty &&
+        value < picItem.imgs!.length) {
+      picName = basePath + picItem.imgs![value];
     } else {
       picName =
           "$basePath${picItem.imgPrename ?? ""}${int2Str(value)}${picItem.imgExtname ?? ""}";

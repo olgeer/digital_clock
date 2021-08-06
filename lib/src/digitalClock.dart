@@ -887,8 +887,8 @@ class ItemConfig {
     this.textStyle = const TextStyle(fontSize: 12),
   });
 
-  static ItemConfig fromString(String itemJsonStr) {
-    print(itemJsonStr);
+  static ItemConfig? fromString(String? itemJsonStr) {
+    if (itemJsonStr == null) return null;
     return json.decode(itemJsonStr);
   }
 

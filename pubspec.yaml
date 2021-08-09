@@ -1,8 +1,8 @@
 name: digital_clock
 description: A configurable digital clock widget.
-version: 1.0.0
-author:
-homepage:
+version: 2.0.0
+  author:olgeer@163.com
+  homepage:https://github.com/olgeer/digital_clock
 
 environment:
   sdk: ">=2.12.0 <3.0.0"

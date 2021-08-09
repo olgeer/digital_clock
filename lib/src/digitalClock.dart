@@ -260,16 +260,18 @@ class DigitalClockState extends State<DigitalClock>
     );
   }
 
-  Widget buildImage(String picName, {BoxFit fit = BoxFit.cover}) {
-    return picName.contains("assets:")
-        ? Image.asset(
-            picName.replaceFirst("assets:", ""),
-            fit: fit,
-          )
-        : Image.file(
-            File(picName),
-            fit: fit,
-          );
+  Widget buildImage(String? picName, {BoxFit fit = BoxFit.cover}) {
+    return picName == null
+        ? nullWidget
+        : picName.contains("assets:")
+            ? Image.asset(
+                picName.replaceFirst("assets:", ""),
+                fit: fit,
+              )
+            : Image.file(
+                File(picName),
+                fit: fit,
+              );
   }
 
   Widget buildPicItem(int value, ItemConfig picItem) {
@@ -603,7 +605,7 @@ class DigitalClockState extends State<DigitalClock>
   Widget buildBodyImage(ItemConfig? bodyImage) {
     if (bodyImage == null) return nullWidget;
 
-    String picName = "";
+    String? picName;
     if (bodyImage.imgs != null &&
         bodyImage.imgs!.isNotEmpty &&
         bodyImage.imgs!.length > 0) {
@@ -624,7 +626,7 @@ class DigitalClockState extends State<DigitalClock>
   Widget buildExitControl(ItemConfig? exitItem) {
     if (exitItem == null) return nullWidget;
 
-    String picName = "";
+    String? picName;
     if (exitItem.imgs != null && exitItem.imgs!.length > 0) {
       picName = "${widget.config.skinBasePath}${exitItem.imgs!.first}";
     }
@@ -680,7 +682,7 @@ class DigitalClockState extends State<DigitalClock>
   Widget buildSettingControl(ItemConfig? settingItem, String basePath) {
     if (settingItem == null) return nullWidget;
 
-    String picName = "";
+    String? picName;
     if (settingItem.style == ActionStyle.pic.index) {
       if (settingItem.imgs != null &&
           settingItem.imgs!.isNotEmpty &&
@@ -728,7 +730,7 @@ class DigitalClockState extends State<DigitalClock>
   Widget buildSlientControl(ItemConfig? slientItem, String basePath) {
     if (slientItem == null) return nullWidget;
 
-    String picName = "";
+    String? picName;
     if (slientItem.style == ActionStyle.pic.index) {
       if (slientItem.imgs != null && slientItem.imgs!.length > 1) {
         if (isSlient)
@@ -773,7 +775,7 @@ class DigitalClockState extends State<DigitalClock>
               )
             : slientItem.style == ActionStyle.icon.index
                 ? Icon(
-                    new IconData(int.parse(picName),
+          new IconData(int.parse(picName ?? "58751"),
                         fontFamily: "MaterialIcons"),
                     color: widget.config.foregroundColor,
                     size: slientItem.rect.height * scale,

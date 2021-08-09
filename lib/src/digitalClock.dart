@@ -50,7 +50,7 @@ class DigitalClockState extends State<DigitalClock>
   late Duration animationDuration;
   late double xScale, yScale;
   AnimationController? animationController;
-  late Animation<Color> animation;
+  late Animation<Color?> animation;
   Logger logger = Logger("DigitalClock");
 
   @override
@@ -81,7 +81,7 @@ class DigitalClockState extends State<DigitalClock>
 
     animation = ColorTween(
             begin: widget.config.backgroundColor, end: widget.config.blinkColor)
-        .animate(animationController!) as Animation<Color>;
+        .animate(animationController!);
     animationController?.addStatusListener((status) {
       logger.finer("Animation state = ${status.toString()}");
       if (status == AnimationStatus.completed)

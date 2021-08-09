@@ -1023,13 +1023,13 @@ class DigitalClockConfig {
       this.height = 100,
       this.width = 200});
 
-  static DigitalClockConfig? fromFile(File configFile) {
+  static DigitalClockConfig? fromFile(File? configFile) {
     if (configFile == null || !configFile.existsSync()) return null;
     return fromJson(configFile.readAsStringSync());
   }
 
-  static DigitalClockConfig fromJson(String jsonStr) {
-    // if (jsonStr == null) return null;
+  static DigitalClockConfig? fromJson(String? jsonStr) {
+    if (jsonStr == null) return null;
 
     var jMap = jsonDecode(jsonStr);
     return DigitalClockConfig(

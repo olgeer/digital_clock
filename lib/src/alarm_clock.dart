@@ -37,17 +37,17 @@ class AlarmClock {
   ///刻钟报时音文件
   bool canQuarterAlarm = true;
   dynamic? quarterAlarmSound;
-  int quarterSoundIdx = 0;
+  int? quarterSoundIdx;
 
   ///半点报时音文件
   bool canHalfAlarm = true;
   dynamic? halfAlarmSound;
-  int halfSoundIdx = 0;
+  int? halfSoundIdx;
 
   ///整点报时音文件
   bool canHourAlarm = true;
   dynamic? hourAlarmSound;
-  int oclockSoundIdx = 0;
+  int? oclockSoundIdx;
 
   ///静音开关
   bool isSlient = false;
@@ -135,14 +135,14 @@ class AlarmClock {
     // await sound.play(await sound.loadSound(uriRes));
   }
 
-  set newAlarmAction(actionCall action) {
-    alarmTask?.cancel();
+  set newAlarmAction(actionCall? action) {
+    alarmTask.cancel();
     alarmAction = action ?? alarmAction;
     alarmTask = cron.schedule(alarmSchedule, alarmAction);
   }
 
   set newSchedule(Schedule s) {
-    alarmTask?.cancel();
+    alarmTask.cancel();
     alarmSchedule = s;
     alarmTask = cron.schedule(alarmSchedule, alarmAction);
   }
@@ -185,7 +185,6 @@ class AlarmClock {
   }
 
   void addSpecialSchedule(Schedule s, String alarmTemplate) {
-    assert(s != null && alarmTemplate != null);
     specialAlarms.putIfAbsent(alarmTemplate, () => s);
   }
 
@@ -216,32 +215,37 @@ class AlarmClock {
     switch (now.minute) {
       case 15:
         alertTime = aQuarterTemplate.tl(args: [now.hour.toString()]);
-        if (quarterSoundIdx != null && canQuarterAlarm)
-          playSound(quarterSoundIdx,
+        if (quarterSoundIdx != null && canQuarterAlarm) {
+          playSound(quarterSoundIdx!,
               repeat: true, duration: Duration(seconds: 2));
+        }
         intervalAction(FlashLamp.flash, millisecondInterval: [300]);
         Vibrate.littleShake();
         break;
       case 45:
         alertTime = threeQuarterTemplate.tl(args: [now.hour.toString()]);
-        if (quarterSoundIdx != null && canQuarterAlarm)
-          playSound(quarterSoundIdx,
+        if (quarterSoundIdx != null && canQuarterAlarm) {
+          playSound(quarterSoundIdx!,
               repeat: true, duration: Duration(seconds: 2));
+        }
         intervalAction(FlashLamp.flash, millisecondInterval: [300]);
         Vibrate.littleShake();
         break;
       case 30:
         alertTime = halfPastTemplate.tl(args: [now.hour.toString()]);
-        if (halfSoundIdx != null && canHalfAlarm)
-          playSound(halfSoundIdx, repeat: true, duration: Duration(seconds: 2));
+        if (halfSoundIdx != null && canHalfAlarm) {
+          playSound(halfSoundIdx!,
+              repeat: true, duration: Duration(seconds: 2));
+        }
         intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
         Vibrate.mediumVibrate();
         break;
       case 0:
         alertTime = oclockTemplate.tl(args: [now.hour.toString()]);
-        if (oclockSoundIdx != null && canHourAlarm)
-          playSound(oclockSoundIdx,
+        if (oclockSoundIdx != null && canHourAlarm) {
+          playSound(oclockSoundIdx!,
               repeat: true, duration: Duration(seconds: 3));
+        }
         intervalAction(FlashLamp.flash,
             millisecondInterval: [300, 1300, 1600, 3300, 3600, 4300, 4600]);
         Vibrate.longVibrate();
@@ -249,7 +253,9 @@ class AlarmClock {
       default:
         alertTime = anytimeTemplate
             .tl(args: [now.hour.toString(), now.minute.toString()]);
-        if (quarterSoundIdx != null) playSound(quarterSoundIdx);
+        if (quarterSoundIdx != null) {
+          playSound(quarterSoundIdx!);
+        }
         intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
         Vibrate.mediumVibrate();
         break;

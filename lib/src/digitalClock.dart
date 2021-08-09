@@ -90,7 +90,7 @@ class DigitalClockState extends State<DigitalClock>
     });
     animationController?.addListener(() {
       setState(() {
-        logger.finest(animation?.value);
+        logger.finest(animation.value);
       });
     });
     // animationController.forward();
@@ -207,14 +207,14 @@ class DigitalClockState extends State<DigitalClock>
     logger.finest("Tiktok running $now");
     if (getHour(now.hour) != hours && hourFlipNumber != null) {
       hourFlipNumber?.currentValue = getHour(now.hour);
-      hourFlipNumber?.controller?.forward();
+      hourFlipNumber?.controller.forward();
       intervalAction(() => animationController?.forward,
           millisecondInterval: [300, 1300, 1600, 2300, 3600]);
     }
     if (now.minute != minutes && minuteFlipNumber != null) {
       logger.finest("minuteFlipNumber flip !");
       minuteFlipNumber?.currentValue = now.minute;
-      minuteFlipNumber?.controller?.forward();
+      minuteFlipNumber?.controller.forward();
       if (now.minute == 30) {
         intervalAction(() => animationController?.forward,
             millisecondInterval: [300, 1300, 1600]);
@@ -246,7 +246,7 @@ class DigitalClockState extends State<DigitalClock>
   Widget buildTextItem(
       String itemText, Rect itemRect, TextStyle itemTextStyle) {
     TextStyle scaleTextStyle = itemTextStyle.copyWith(
-        fontSize: (itemTextStyle?.fontSize ?? 12) * scale);
+        fontSize: (itemTextStyle.fontSize ?? 12) * scale);
     return Container(
       // color: Colors.white12,
       height: widget.config.height * scale,
@@ -687,7 +687,7 @@ class DigitalClockState extends State<DigitalClock>
       if (settingItem.imgs != null &&
           settingItem.imgs!.isNotEmpty &&
           settingItem.imgs!.length > 0) {
-        picName = basePath ?? "" + settingItem.imgs!.first;
+        picName = basePath + settingItem.imgs!.first;
       }
       if (settingItem.imgPrename != null || settingItem.imgExtname != null) {
         picName =
@@ -734,9 +734,9 @@ class DigitalClockState extends State<DigitalClock>
     if (slientItem.style == ActionStyle.pic.index) {
       if (slientItem.imgs != null && slientItem.imgs!.length > 1) {
         if (isSlient)
-          picName = "${basePath ?? ""}${slientItem.imgs![0]}";
+          picName = "$basePath${slientItem.imgs![0]}";
         else
-          picName = "${basePath ?? ""}${slientItem.imgs![1]}";
+          picName = "$basePath${slientItem.imgs![1]}";
       }
       if (slientItem.imgPrename != null || slientItem.imgExtname != null) {
         if (isSlient)
@@ -797,7 +797,7 @@ class DigitalClockState extends State<DigitalClock>
     return Container(
         height: widget.height,
         width: widget.width,
-        color: animation?.value ?? widget.config.backgroundColor,
+        color: animation.value ?? widget.config.backgroundColor,
         child: Stack(
           alignment: Alignment.center,
           children: [
@@ -1068,15 +1068,15 @@ class DigitalClockConfig {
       "weekdayItem": weekdayItem,
       "hourItem": hourItem,
       "minuteItem": minuteItem,
-      "timeType": timeType?.index,
+      "timeType": timeType.index,
       "h12Item": h12Item,
       "tiktokItem": tiktokItem,
       "settingItem": settingItem,
       "exitItem": exitItem,
       "slientItem": slientItem,
-      "backgroundColor": backgroundColor?.value,
-      "blinkColor": blinkColor?.value,
-      "foregroundColor": foregroundColor?.value,
+      "backgroundColor": backgroundColor.value,
+      "blinkColor": blinkColor.value,
+      "foregroundColor": foregroundColor.value,
       "backgroundImage": backgroundImage,
       "bodyImage": bodyImage,
       "height": height,

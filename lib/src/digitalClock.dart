@@ -239,7 +239,7 @@ class DigitalClockState extends State<DigitalClock>
     double t = ((widget.config.height / 2) + itemRect.top) * rectScale;
     double r = ((widget.config.width / 2) - itemRect.right) * rectScale;
     double b = ((widget.config.height / 2) - itemRect.bottom) * rectScale;
-    // print("EdgeInsets.fromLTRB($l,$t,$r,$b)");
+    // print("Rect($itemRect) EdgeInsets.fromLTRB($l,$t,$r,$b)");
     return EdgeInsets.fromLTRB(l, t, r, b);
   }
 
@@ -249,8 +249,10 @@ class DigitalClockState extends State<DigitalClock>
         fontSize: (itemTextStyle.fontSize ?? 12) * scale);
     return Container(
       // color: Colors.white12,
-      height: widget.config.height * scale,
-      width: widget.config.width * scale,
+      // height: widget.config.height * scale,
+      // width: widget.config.width * scale,
+      height: itemRect.height * scale,
+      width: itemRect.width * scale,
       margin: buildEdgeRect(itemRect),
       alignment: Alignment.center,
       child: Text(
@@ -287,18 +289,23 @@ class DigitalClockState extends State<DigitalClock>
     // print(picName);
     return Container(
       // color: Colors.white12,
-      height: widget.config.height * scale,
-      width: widget.config.width * scale,
+      // color: Colors.grey.withAlpha(50),
+      // height: widget.config.height * scale,
+      // width: widget.config.width * scale,
+      height: picItem.rect.height * scale,
+      width: picItem.rect.width * scale,
       margin: buildEdgeRect(picItem.rect),
       alignment: Alignment.center,
-      child: buildImage(picName),
+      child: buildImage(picName, fit: BoxFit.contain),
     );
   }
 
   Widget buildHourFlipItem(int value, ItemConfig picItem, String basePath) {
     return Container(
-      height: widget.config.height * scale,
-      width: widget.config.width * scale,
+      // height: widget.config.height * scale,
+      // width: widget.config.width * scale,
+      height: picItem.rect.height * scale,
+      width: picItem.rect.width * scale,
       margin: buildEdgeRect(picItem.rect),
       alignment: Alignment.center,
       child: hourFlipNumber,
@@ -307,8 +314,10 @@ class DigitalClockState extends State<DigitalClock>
 
   Widget buildMinuteFlipItem(int value, ItemConfig picItem, String basePath) {
     return Container(
-      height: widget.config.height * scale,
-      width: widget.config.width * scale,
+      // height: widget.config.height * scale,
+      // width: widget.config.width * scale,
+      height: picItem.rect.height * scale,
+      width: picItem.rect.width * scale,
       margin: buildEdgeRect(picItem.rect),
       alignment: Alignment.center,
       child: minuteFlipNumber,
@@ -660,8 +669,11 @@ class DigitalClockState extends State<DigitalClock>
       },
       child: Container(
         color: Colors.transparent,
-        height: widget.config.height * scale,
-        width: widget.config.width * scale,
+        // color: Colors.grey.withAlpha(50),
+        // height: widget.config.height * scale,
+        // width: widget.config.width * scale,
+        height: exitItem.rect.height * scale,
+        width: exitItem.rect.width * scale,
         margin: buildEdgeRect(exitItem.rect),
         alignment: Alignment.center,
         child: exitItem.style == ActionStyle.pic.index && picName != null
@@ -706,10 +718,13 @@ class DigitalClockState extends State<DigitalClock>
       onTap: () => widget.fireClockEvent(ClockEvent(ClockEventType.setting)),
       child: Container(
         color: Colors.transparent,
-        height: widget.config.height * scale,
-        width: widget.config.width * scale,
+        // color: Colors.grey.withAlpha(50),
+        // height: widget.config.height * scale,
+        // width: widget.config.width * scale,
+        height: settingItem.rect.height * scale,
+        width: settingItem.rect.width * scale,
         margin: buildEdgeRect(settingItem.rect),
-        alignment: Alignment.center,
+        // alignment: Alignment.center,
         child: settingItem.style == ActionStyle.pic.index && picName != null
             ? buildImage(
                 picName,
@@ -764,8 +779,10 @@ class DigitalClockState extends State<DigitalClock>
       }),
       child: Container(
         color: Colors.transparent,
-        height: widget.config.height * scale,
-        width: widget.config.width * scale,
+        // height: widget.config.height * scale,
+        // width: widget.config.width * scale,
+        height: slientItem.rect.height * scale,
+        width: slientItem.rect.width * scale,
         margin: buildEdgeRect(slientItem.rect),
         alignment: Alignment.center,
         child: slientItem.style == ActionStyle.pic.index
@@ -775,7 +792,7 @@ class DigitalClockState extends State<DigitalClock>
               )
             : slientItem.style == ActionStyle.icon.index
                 ? Icon(
-          new IconData(int.parse(picName ?? "58751"),
+                    new IconData(int.parse(picName ?? "58751"),
                         fontFamily: "MaterialIcons"),
                     color: widget.config.foregroundColor,
                     size: slientItem.rect.height * scale,

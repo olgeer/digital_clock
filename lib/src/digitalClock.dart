@@ -612,8 +612,8 @@ class DigitalClockState extends State<DigitalClock>
       picName = "${widget.config.skinBasePath}${bodyImage.imgs!.first}";
     }
     return Container(
-      height: widget.height * scale,
-      width: widget.width * scale,
+      height: widget.config.height * scale,
+      width: widget.config.width * scale,
       margin: buildEdgeRect(bodyImage.rect),
       alignment: Alignment.center,
       child: buildImage(

@@ -199,7 +199,7 @@ class _FlipNumberState extends State<FlipNumber>
   }
 
   // 默认隐藏
-  Widget uppeer1() {
+  Widget upper1() {
     return _makeUpper(_nextIndex);
   }
 
@@ -239,7 +239,7 @@ class _FlipNumberState extends State<FlipNumber>
       children: <Widget>[
         Stack(
           children: <Widget>[
-            uppeer1(),
+            upper1(),
             upper2(),
           ],
         ),
@@ -259,6 +259,7 @@ class Pannel extends StatelessWidget {
   int value;
   String basePath;
   double scale;
+
   Pannel({
     required this.value,
     required this.picItem,
@@ -266,15 +267,22 @@ class Pannel extends StatelessWidget {
     required this.scale,
   });
 
-  Widget buildImage(String picName, {BoxFit fit = BoxFit.cover}) {
+  Logger logger = Logger("Pannel");
+
+  Widget buildImage(String picName, Size picSize,
+      {BoxFit fit = BoxFit.contain}) {
     return picName.contains("assets:")
         ? Image.asset(
             picName.replaceFirst("assets:", ""),
             fit: fit,
+            height: picSize.height * scale,
+            width: picSize.width * scale,
           )
         : Image.file(
             File(picName),
             fit: fit,
+            height: picSize.height * scale,
+            width: picSize.width * scale,
           );
   }
 
@@ -291,6 +299,7 @@ class Pannel extends StatelessWidget {
     if (picItem.imgs == null &&
         picItem.imgPrename == null &&
         picItem.imgExtname == null) {
+      //纯文本翻页
       return Container(
         height: picItem.rect.height * scale,
         width: picItem.rect.width * scale,
@@ -305,27 +314,30 @@ class Pannel extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
       );
-    }
-    String picName;
-    if (picItem.imgs != null &&
-        picItem.imgs!.isNotEmpty &&
-        value < picItem.imgs!.length) {
-      picName = basePath + picItem.imgs![value];
     } else {
-      picName =
-          "$basePath${picItem.imgPrename ?? ""}${int2Str(value)}${picItem.imgExtname ?? ""}";
+      //图片翻页
+      String picName;
+      if (picItem.imgs != null &&
+          picItem.imgs!.isNotEmpty &&
+          value < picItem.imgs!.length) {
+        picName = basePath + picItem.imgs![value];
+      } else {
+        picName =
+            "$basePath${picItem.imgPrename ?? ""}${int2Str(value)}${picItem.imgExtname ?? ""}";
+      }
+      // logger.fine("Pannel height: ${picItem.rect.height * scale},width: ${picItem.rect.width * scale}");
+      return Container(
+        // color: Colors.grey.withAlpha(50),
+        height: picItem.rect.height * scale,
+        width: picItem.rect.width * scale,
+        margin: EdgeInsets.all(0.0),
+        alignment: Alignment.center,
+        child: buildImage(
+          picName,
+          picItem.rect.size,
+          fit: BoxFit.contain,
+        ),
+      );
     }
-    // print(picName);
-    return Container(
-      // color: Colors.white12,
-      height: picItem.rect.height * scale,
-      width: picItem.rect.width * scale,
-      margin: EdgeInsets.all(0.0),
-      alignment: Alignment.center,
-      child: buildImage(
-        picName,
-        fit: BoxFit.cover,
-      ),
-    );
   }
 }

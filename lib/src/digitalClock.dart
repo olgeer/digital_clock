@@ -247,8 +247,9 @@ class DigitalClockState extends State<DigitalClock>
       String itemText, Rect itemRect, TextStyle itemTextStyle) {
     TextStyle scaleTextStyle = itemTextStyle.copyWith(
         fontSize: (itemTextStyle.fontSize ?? 12) * scale);
+    // logger.fine("itemText:$itemText");
     return Container(
-      // color: Colors.white12,
+      // color: Colors.grey.withAlpha(50),
       // height: widget.config.height * scale,
       // width: widget.config.width * scale,
       height: itemRect.height * scale,
@@ -262,17 +263,22 @@ class DigitalClockState extends State<DigitalClock>
     );
   }
 
-  Widget buildImage(String? picName, {BoxFit fit = BoxFit.cover}) {
+  Widget buildImage(String? picName, Size picRect,
+      {BoxFit fit = BoxFit.cover}) {
     return picName == null
         ? nullWidget
         : picName.contains("assets:")
             ? Image.asset(
                 picName.replaceFirst("assets:", ""),
                 fit: fit,
+                height: picRect.height * scale,
+                width: picRect.width * scale,
               )
             : Image.file(
                 File(picName),
                 fit: fit,
+                height: picRect.height * scale,
+                width: picRect.width * scale,
               );
   }
 
@@ -296,7 +302,7 @@ class DigitalClockState extends State<DigitalClock>
       width: picItem.rect.width * scale,
       margin: buildEdgeRect(picItem.rect),
       alignment: Alignment.center,
-      child: buildImage(picName, fit: BoxFit.contain),
+      child: buildImage(picName, picItem.rect.size, fit: BoxFit.contain),
     );
   }
 
@@ -304,6 +310,7 @@ class DigitalClockState extends State<DigitalClock>
     return Container(
       // height: widget.config.height * scale,
       // width: widget.config.width * scale,
+      // color: Colors.grey.withAlpha(50),
       height: picItem.rect.height * scale,
       width: picItem.rect.width * scale,
       margin: buildEdgeRect(picItem.rect),
@@ -606,8 +613,9 @@ class DigitalClockState extends State<DigitalClock>
     return Container(
       height: widget.height,
       width: widget.width,
-      child:
-          buildImage("${widget.config.skinBasePath}$bgImage", fit: BoxFit.fill),
+      child: buildImage("${widget.config.skinBasePath}$bgImage",
+          Size(widget.width, widget.height),
+          fit: BoxFit.fill),
     );
   }
 
@@ -620,13 +628,17 @@ class DigitalClockState extends State<DigitalClock>
         bodyImage.imgs!.length > 0) {
       picName = "${widget.config.skinBasePath}${bodyImage.imgs!.first}";
     }
+    logger.fine(
+        "height: ${widget.config.height * scale},width: ${widget.config.width * scale},rect:${buildEdgeRect(bodyImage.rect).collapsedSize}");
     return Container(
       height: widget.config.height * scale,
       width: widget.config.width * scale,
+      // color: Colors.grey.withAlpha(50),
       margin: buildEdgeRect(bodyImage.rect),
       alignment: Alignment.center,
       child: buildImage(
         picName,
+        bodyImage.rect.size,
         fit: BoxFit.contain,
       ),
     );
@@ -678,7 +690,8 @@ class DigitalClockState extends State<DigitalClock>
         alignment: Alignment.center,
         child: exitItem.style == ActionStyle.pic.index && picName != null
             ? buildImage(
-                picName,
+          picName,
+                exitItem.rect.size,
                 fit: BoxFit.cover,
               )
             : exitItem.style == ActionStyle.icon.index && picName != null
@@ -727,7 +740,8 @@ class DigitalClockState extends State<DigitalClock>
         // alignment: Alignment.center,
         child: settingItem.style == ActionStyle.pic.index && picName != null
             ? buildImage(
-                picName,
+          picName,
+                settingItem.rect.size,
                 fit: BoxFit.cover,
               )
             : settingItem.style == ActionStyle.icon.index && picName != null
@@ -787,7 +801,8 @@ class DigitalClockState extends State<DigitalClock>
         alignment: Alignment.center,
         child: slientItem.style == ActionStyle.pic.index
             ? buildImage(
-                picName,
+          picName,
+                slientItem.rect.size,
                 fit: BoxFit.cover,
               )
             : slientItem.style == ActionStyle.icon.index

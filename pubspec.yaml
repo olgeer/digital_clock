@@ -13,7 +13,7 @@ dependencies:
   logging: ^1.0.1
   wakelock: ^0.5.3+3
   vibration: ^1.7.4-nullsafety.0
-  cron: ^0.3.1
+  cron: ^0.3.2
   soundpool: ^2.1.0
   fluttertoast: ^8.0.8
   phone_lamp:

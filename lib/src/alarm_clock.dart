@@ -76,6 +76,7 @@ class AlarmClock {
       this.canHalfAlarm = true,
       this.canQuarterAlarm = true,
       this.enableFlashLamp = true,
+      this.isSlient = false,
       this.quarterAlarmSound,
       this.halfAlarmSound,
       this.hourAlarmSound}) {

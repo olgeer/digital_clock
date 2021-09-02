@@ -49,7 +49,7 @@ packages:
       name: cron
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.3.1"
+    version: "0.3.2"
   fake_async:
     dependency: transitive
     description:

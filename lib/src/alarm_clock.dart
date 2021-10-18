@@ -71,11 +71,11 @@ class AlarmClock {
       this.sleepEnableAction,
       this.sleepDisableAction,
       this.enableVibrate = true,
+      this.enableFlashLamp = true,
       this.enableAlarmSound = true,
       this.canHourAlarm = true,
       this.canHalfAlarm = true,
       this.canQuarterAlarm = true,
-      this.enableFlashLamp = true,
       this.isSlient = false,
       this.quarterAlarmSound,
       this.halfAlarmSound,
@@ -219,49 +219,56 @@ class AlarmClock {
     switch (now.minute) {
       case 15:
         alertTime = aQuarterTemplate.tl(args: [now.hour.toString()]);
-        if (quarterSoundIdx != null && canQuarterAlarm) {
+        if (quarterSoundIdx != null && canQuarterAlarm && enableAlarmSound) {
           playSound(quarterSoundIdx!,
               repeat: true, duration: Duration(seconds: 2));
         }
-        intervalAction(FlashLamp.flash, millisecondInterval: [300]);
-        Vibrate.littleShake();
+        if (enableFlashLamp)
+          intervalAction(FlashLamp.flash, millisecondInterval: [300]);
+        if (enableVibrate) Vibrate.littleShake();
         break;
       case 45:
         alertTime = threeQuarterTemplate.tl(args: [now.hour.toString()]);
-        if (quarterSoundIdx != null && canQuarterAlarm) {
+        if (quarterSoundIdx != null && canQuarterAlarm && enableAlarmSound) {
           playSound(quarterSoundIdx!,
               repeat: true, duration: Duration(seconds: 2));
         }
-        intervalAction(FlashLamp.flash, millisecondInterval: [300]);
-        Vibrate.littleShake();
+        if (enableFlashLamp)
+          intervalAction(FlashLamp.flash, millisecondInterval: [300]);
+        if (enableVibrate) Vibrate.littleShake();
         break;
       case 30:
         alertTime = halfPastTemplate.tl(args: [now.hour.toString()]);
-        if (halfSoundIdx != null && canHalfAlarm) {
+        if (halfSoundIdx != null && canHalfAlarm && enableAlarmSound) {
           playSound(halfSoundIdx!,
               repeat: true, duration: Duration(seconds: 2));
         }
-        intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
-        Vibrate.mediumVibrate();
+        if (enableFlashLamp)
+          intervalAction(FlashLamp.flash,
+              millisecondInterval: [300, 1300, 1600]);
+        if (enableVibrate) Vibrate.mediumVibrate();
         break;
       case 0:
         alertTime = oclockTemplate.tl(args: [now.hour.toString()]);
-        if (oclockSoundIdx != null && canHourAlarm) {
+        if (oclockSoundIdx != null && canHourAlarm && enableAlarmSound) {
           playSound(oclockSoundIdx!,
               repeat: true, duration: Duration(seconds: 3));
         }
-        intervalAction(FlashLamp.flash,
-            millisecondInterval: [300, 1300, 1600, 3300, 3600, 4300, 4600]);
-        Vibrate.longVibrate();
+        if (enableFlashLamp)
+          intervalAction(FlashLamp.flash,
+              millisecondInterval: [300, 1300, 1600, 3300, 3600, 4300, 4600]);
+        if (enableVibrate) Vibrate.longVibrate();
         break;
       default:
         alertTime = anytimeTemplate
             .tl(args: [now.hour.toString(), now.minute.toString()]);
-        if (quarterSoundIdx != null) {
+        if (quarterSoundIdx != null && enableAlarmSound) {
           playSound(quarterSoundIdx!);
         }
-        intervalAction(FlashLamp.flash, millisecondInterval: [300, 1300, 1600]);
-        Vibrate.mediumVibrate();
+        if (enableFlashLamp)
+          intervalAction(FlashLamp.flash,
+              millisecondInterval: [300, 1300, 1600]);
+        if (enableVibrate) Vibrate.mediumVibrate();
         break;
     }
 

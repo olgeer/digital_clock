@@ -2,8 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:digital_clock/src/Toast.dart';
+import 'package:digital_clock/src/lamp.dart';
+import 'package:digital_clock/src/vibrate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_picker/flutter_picker.dart';
 import 'package:logging/logging.dart';
 
 import 'define.dart';
@@ -26,8 +30,7 @@ class DigitalClock extends StatefulWidget {
     required this.config,
     this.onClockEvent,
     this.onExitAction,
-  })  : assert(config != null),
-        super();
+  }) : super();
 
   @override
   State<StatefulWidget> createState() => DigitalClockState();
@@ -38,15 +41,21 @@ class DigitalClock extends StatefulWidget {
 
 class DigitalClockState extends State<DigitalClock>
     with SingleTickerProviderStateMixin {
-  late int hours, minutes, years, months, days, weekday;
+  late int hours, minutes, seconds, years, months, days, weekday;
+  int? cdHours, cdMinutes, cdSeconds;
   int h12 = 0, tk = 0;
   bool isSlient = false;
+  bool refreshClock = false, refreshCd = false;
+  bool countDownMode = false;
+  DateTime? countDownBeginTime;
+  Duration? countDownDuration;
   late String currentSkinName;
   late String skinBasePath;
   late Timer clockTimer;
   double scale = 1;
   Widget nullWidget = Container();
-  FlipNumber? hourFlipNumber, minuteFlipNumber;
+  FlipNumber? hourFlipNumber, minuteFlipNumber, secondFlipNumber;
+  FlipNumber? cdHourFlipNumber, cdMinuteFlipNumber, cdSecondFlipNumber;
   late Duration animationDuration;
   late double xScale, yScale;
   AnimationController? animationController;
@@ -59,7 +68,7 @@ class DigitalClockState extends State<DigitalClock>
     // initScale();
     init();
     initAnimate();
-    tiktok();
+    // tiktok();
     clockTimer = Timer.periodic(Duration(seconds: 1), (timer) {
       tiktok();
     });
@@ -70,6 +79,7 @@ class DigitalClockState extends State<DigitalClock>
     clockTimer.cancel();
     SystemChrome.setEnabledSystemUIOverlays(
         [SystemUiOverlay.top, SystemUiOverlay.bottom]);
+    animationController?.dispose();
     super.dispose();
   }
 
@@ -90,19 +100,19 @@ class DigitalClockState extends State<DigitalClock>
     });
     animationController?.addListener(() {
       setState(() {
-        logger.finest(animation.value);
+        logger.fine(animation.value);
       });
     });
     // animationController.forward();
   }
 
-  void initScale(){
+  void initScale() {
     xScale = widget.width / widget.config.width;
     yScale = widget.height / widget.config.height;
     scale = xScale < yScale ? xScale : yScale;
     logger.fine("widget.width=${widget.width} widget.height=${widget.height}");
     logger.fine("xs=$xScale ys=$yScale scale=$scale");
-    widget.sizeChange=false;
+    widget.sizeChange = false;
   }
 
   void init() {
@@ -112,62 +122,176 @@ class DigitalClockState extends State<DigitalClock>
 
     skinBasePath = widget.config.skinBasePath ?? "";
 
-    animationDuration = Duration(milliseconds: 2300);
+    animationDuration = Duration(milliseconds: 900);
 
     refreshTime(DateTime.now());
 
-    if (widget.config.hourItem?.style == TimeStyle.flip.index) {
-      if (hourFlipNumber == null && widget.config.hourItem != null) {
+    initHourFlipNumber(widget.config.hourItem);
+    initMinuteFlipNumber(widget.config.minuteItem);
+    initSecondFlipNumber(widget.config.secondItem);
+
+    initCdHourFlipNumber(widget.config.cdHourItem);
+    initCdMinuteFlipNumber(widget.config.cdMinuteItem);
+    initCdSecondFlipNumber(widget.config.cdSecondItem);
+
+    // Wakelock.enable();
+    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+  }
+
+  Widget initHourFlipNumber(ItemConfig? item, {int? initValue}) {
+    if (item?.style == TimeStyle.flip.index) {
+      if (hourFlipNumber == null) {
         hourFlipNumber = FlipNumber(
+          "hourFlipNumber",
           scale: scale,
           basePath: skinBasePath,
-          numberItem: widget.config.hourItem!,
+          numberItem: item!,
           animationDuration: animationDuration,
           canRevese: false,
           isPositiveSequence: true,
           min: widget.config.timeType == TimeType.h12 ? 1 : 0,
           max: widget.config.timeType == TimeType.h12 ? 12 : 23,
-          currentValue: hours,
+          currentValue: initValue ?? hours,
         );
-      }else {
+      } else {
         hourFlipNumber?.scale = scale;
-        hourFlipNumber?.currentValue = hours;
-        hourFlipNumber?.refresh();
+        hourFlipNumber?.currentValue = initValue ?? hours;
+        if (hourFlipNumber?.refresh != null) hourFlipNumber!.refresh();
       }
     } else {
-      if (hourFlipNumber != null) {
-        // hourFlipNumber.controller.dispose();
-        hourFlipNumber = null;
-      }
+      // hourFlipNumber = null;
     }
+    return hourFlipNumber ?? nullWidget;
+  }
 
-    if (widget.config.minuteItem?.style == TimeStyle.flip.index) {
-      if (minuteFlipNumber == null && widget.config.minuteItem != null) {
+  Widget initMinuteFlipNumber(ItemConfig? item, {int? initValue}) {
+    if (item?.style == TimeStyle.flip.index) {
+      if (minuteFlipNumber == null) {
         minuteFlipNumber = FlipNumber(
+          "minuteFlipNumber",
           scale: scale,
           basePath: skinBasePath,
-          numberItem: widget.config.minuteItem!,
+          numberItem: item!,
           animationDuration: animationDuration,
           canRevese: false,
           isPositiveSequence: true,
           min: 0,
           max: 59,
-          currentValue: minutes,
+          currentValue: initValue ?? minutes,
         );
-      }else {
+      } else {
         minuteFlipNumber?.scale = scale;
-        minuteFlipNumber?.currentValue = minutes;
-        minuteFlipNumber?.refresh();
+        minuteFlipNumber?.currentValue = initValue ?? minutes;
+        if (minuteFlipNumber?.refresh != null) minuteFlipNumber!.refresh();
       }
     } else {
-      if (minuteFlipNumber != null) {
-        // minuteFlipNumber.controller.dispose();
-        minuteFlipNumber = null;
-      }
+      // minuteFlipNumber = null;
     }
+    return minuteFlipNumber ?? nullWidget;
+  }
 
-    // Wakelock.enable();
-    SystemChrome.setEnabledSystemUIOverlays([SystemUiOverlay.bottom]);
+  Widget initSecondFlipNumber(ItemConfig? item, {int? initValue}) {
+    if (item?.style == TimeStyle.flip.index) {
+      if (secondFlipNumber == null) {
+        secondFlipNumber = FlipNumber(
+          "secondFlipNumber",
+          scale: scale,
+          basePath: skinBasePath,
+          numberItem: item!,
+          animationDuration: animationDuration,
+          canRevese: false,
+          isPositiveSequence: true,
+          min: 0,
+          max: 59,
+          currentValue: initValue ?? seconds,
+        );
+      } else {
+        secondFlipNumber?.scale = scale;
+        secondFlipNumber?.currentValue = initValue ?? seconds;
+        if (secondFlipNumber?.refresh != null) secondFlipNumber!.refresh();
+      }
+    } else {
+      // secondFlipNumber = null;
+    }
+    return secondFlipNumber ?? nullWidget;
+  }
+
+  Widget initCdHourFlipNumber(ItemConfig? item, {int? initValue}) {
+    if (item?.style == TimeStyle.flip.index) {
+      if (cdHourFlipNumber == null) {
+        cdHourFlipNumber = FlipNumber(
+          "cdHourFlipNumber",
+          scale: scale,
+          basePath: skinBasePath,
+          numberItem: item!,
+          animationDuration: animationDuration,
+          canRevese: false,
+          isPositiveSequence: false,
+          min: 0,
+          max: 59,
+          currentValue: initValue ?? cdHours,
+        );
+      } else {
+        cdHourFlipNumber?.scale = scale;
+        cdHourFlipNumber?.currentValue = initValue ?? cdHours;
+        if (cdHourFlipNumber?.refresh != null) cdHourFlipNumber!.refresh();
+      }
+    } else {
+      // cdHourFlipNumber = null;
+    }
+    return cdHourFlipNumber ?? nullWidget;
+  }
+
+  Widget initCdMinuteFlipNumber(ItemConfig? item, {int? initValue}) {
+    if (item?.style == TimeStyle.flip.index) {
+      if (cdMinuteFlipNumber == null) {
+        cdMinuteFlipNumber = FlipNumber(
+          "cdMinuteFlipNumber",
+          scale: scale,
+          basePath: skinBasePath,
+          numberItem: item!,
+          animationDuration: animationDuration,
+          canRevese: false,
+          isPositiveSequence: false,
+          min: 0,
+          max: 59,
+          currentValue: initValue ?? cdMinutes,
+        );
+      } else {
+        cdMinuteFlipNumber?.scale = scale;
+        cdMinuteFlipNumber?.currentValue = initValue ?? cdMinutes;
+        if (cdMinuteFlipNumber?.refresh != null) cdMinuteFlipNumber!.refresh();
+      }
+    } else {
+      // cdMinuteFlipNumber = null;
+    }
+    return cdMinuteFlipNumber ?? nullWidget;
+  }
+
+  Widget initCdSecondFlipNumber(ItemConfig? item, {int? initValue}) {
+    if (item?.style == TimeStyle.flip.index) {
+      if (cdSecondFlipNumber == null) {
+        cdSecondFlipNumber = FlipNumber(
+          "cdSecondFlipNumber",
+          scale: scale,
+          basePath: skinBasePath,
+          numberItem: item!,
+          animationDuration: animationDuration,
+          canRevese: false,
+          isPositiveSequence: false,
+          min: 0,
+          max: 59,
+          currentValue: initValue ?? cdSeconds,
+        );
+      } else {
+        cdSecondFlipNumber?.scale = scale;
+        cdSecondFlipNumber?.currentValue = initValue ?? cdSeconds;
+        if (cdSecondFlipNumber?.refresh != null) cdSecondFlipNumber!.refresh();
+      }
+    } else {
+      // cdSecondFlipNumber = null;
+    }
+    return cdSecondFlipNumber ?? nullWidget;
   }
 
   void refreshTime(DateTime now) {
@@ -177,12 +301,13 @@ class DigitalClockState extends State<DigitalClock>
     weekday = now.weekday;
     hours = getHour(now.hour);
     minutes = now.minute;
+    seconds = now.second;
   }
 
   int getHour(int h) {
     int hour = h;
     if (widget.config.timeType == TimeType.h12) {
-      if (h>=12) {
+      if (h >= 12) {
         hour -= 12;
         h12 = 1;
       } else {
@@ -201,35 +326,208 @@ class DigitalClockState extends State<DigitalClock>
     return s;
   }
 
+  void nothing() {}
+
+  void countDownBegin(int cdMin) {
+    countDownDuration = Duration(minutes: cdMin);
+    countDownBeginTime = DateTime.now();
+    cdHours = countDownDuration?.inHours ?? 0;
+    cdMinutes = countDownDuration?.inMinutes ?? 0;
+    cdSeconds = 0;
+    widget.config.cdHourItem?.style == TimeStyle.flip.index
+        ? cdHourFlipNumber?.initValue(cdHours!)
+        : nothing();
+    widget.config.cdMinuteItem?.style == TimeStyle.flip.index
+        ? cdMinuteFlipNumber?.initValue(cdMinutes!)
+        : nothing();
+    widget.config.cdSecondItem?.style == TimeStyle.flip.index
+        ? cdSecondFlipNumber?.initValue(cdSeconds!)
+        : nothing();
+    setState(() {
+      countDownMode = true;
+      refreshCd = true;
+      widget.fireClockEvent(
+          ClockEvent(ClockEventType.countDownStart, value: countDownDuration));
+    });
+  }
+
+  void countDownOver() {
+    refreshTime(DateTime.now());
+    widget.config.hourItem?.style == TimeStyle.flip.index
+        ? hourFlipNumber?.initValue(hours)
+        : nothing();
+    widget.config.minuteItem?.style == TimeStyle.flip.index
+        ? minuteFlipNumber?.initValue(minutes)
+        : nothing();
+    widget.config.secondItem?.style == TimeStyle.flip.index
+        ? secondFlipNumber?.initValue(seconds)
+        : nothing();
+
+    setState(() {
+      refreshClock = true;
+      countDownMode = false;
+    });
+    widget.fireClockEvent(ClockEvent(ClockEventType.countDownStop));
+  }
+
+  /// 每秒处理显示转换及各种提醒
   void tiktok() {
     DateTime now = DateTime.now();
-    // if(animationController==null||animationController?.status==AnimationStatus.dismissed)animationController?.forward();
-    logger.finest("Tiktok running $now");
-    if (getHour(now.hour) != hours && hourFlipNumber != null) {
-      hourFlipNumber?.currentValue = getHour(now.hour);
-      hourFlipNumber?.controller.forward();
-      intervalAction(() => animationController?.forward,
-          millisecondInterval: [300, 1300, 1600, 2300, 3600]);
-    }
-    if (now.minute != minutes && minuteFlipNumber != null) {
-      logger.finest("minuteFlipNumber flip !");
-      minuteFlipNumber?.currentValue = now.minute;
-      minuteFlipNumber?.controller.forward();
-      if (now.minute == 30) {
-        intervalAction(() => animationController?.forward,
-            millisecondInterval: [300, 1300, 1600]);
-      } else if (now.minute == 15 || now.minute == 45) {
-        intervalAction(() => animationController?.forward,
-            millisecondInterval: [300]);
+    int tkHour, tkMinute, tkSecond;
+
+    if (countDownMode) {
+      int tkInSeconds = countDownDuration!.inSeconds -
+          ((now.millisecondsSinceEpoch -
+                      countDownBeginTime!.millisecondsSinceEpoch) /
+                  1000)
+              .floor();
+
+      /// 倒计时结束
+      if (tkInSeconds == 0) {
+        countDownOver();
       }
-      // else
-      //   intervalAction(animationController?.forward,
-      //       millisecondInterval: [300]);
+
+      tkHour = tkInSeconds ~/ 3600;
+      tkInSeconds -= tkHour * 3600;
+      tkMinute = tkInSeconds ~/ 60;
+      tkInSeconds -= tkMinute * 60;
+      tkSecond = tkInSeconds;
+
+      logger.finest(
+          "countDownDuration: ${countDownDuration?.inSeconds} tkHour:$tkHour tkMinute:$tkMinute tkSecond:$tkSecond");
+      // if(animationController==null||animationController?.status==AnimationStatus.dismissed)animationController?.forward();
+      logger.finest(
+          "Tiktok running in ${countDownMode ? "CountDownMode" : "ClockMode"} $now");
+
+      if (tkHour != cdHours || refreshCd) {
+        if (cdHourFlipNumber != null) {
+          // logger.finest("cdHourFlipNumber flip !");
+          cdHourFlipNumber?.currentValue = tkHour;
+          refreshCd
+              ? cdHourFlipNumber!.refresh()
+              : cdHourFlipNumber?.controller?.forward();
+        }
+        cdHours = tkHour;
+      }
+      if (tkMinute != cdMinutes || refreshCd) {
+        if (cdMinuteFlipNumber != null) {
+          // logger.fine("cdMinuteFlipNumber flip !");
+          cdMinuteFlipNumber!.currentValue = tkMinute;
+          refreshCd
+              ? cdMinuteFlipNumber!.refresh()
+              : cdMinuteFlipNumber!.controller?.forward();
+
+          /// 每5分钟，背景闪烁
+          if (tkMinute % 5 == 0) {
+            intervalAction(() => animationController?.forward,
+                millisecondInterval: [300, 1300, 1600]);
+          }
+        }
+        cdMinutes = tkMinute;
+      }
+      if (tkSecond != cdSeconds || refreshCd) {
+        if (cdSecondFlipNumber != null) {
+          // logger.fine("cdSecondFlipNumber flip ! ${cdSecondFlipNumber!.controller?.value}");
+          cdSecondFlipNumber!.currentValue = tkSecond;
+          refreshCd
+              ? cdSecondFlipNumber!.refresh()
+              : cdSecondFlipNumber!.controller?.forward();
+        }
+        cdSeconds = tkSecond;
+      }
+      refreshCd = false;
+    } else {
+      tkHour = getHour(now.hour);
+      tkMinute = now.minute;
+      tkSecond = now.second;
+
+      logger.finest("$hours : $minutes : $seconds");
+
+      if (tkHour != hours || refreshClock) {
+        if (hourFlipNumber != null) {
+          hourFlipNumber!.currentValue = tkHour;
+          refreshClock
+              ? hourFlipNumber!.refresh()
+              : hourFlipNumber!.controller?.forward();
+
+          /// 整点，背景闪烁
+          intervalAction(() => animationController?.forward,
+              millisecondInterval: [300, 1300, 1600, 2300, 3600]);
+        }
+      }
+      if (tkMinute != minutes || refreshClock) {
+        if (minuteFlipNumber != null) {
+          logger.finest("minuteFlipNumber flip !");
+          minuteFlipNumber?.currentValue = tkMinute;
+          refreshClock
+              ? minuteFlipNumber?.refresh()
+              : minuteFlipNumber?.controller?.forward();
+
+          /// 半点，背景闪烁
+          if (tkMinute == 30 || tkMinute == 52) {
+            intervalAction(() => animationController?.forward,
+                millisecondInterval: [300, 1300, 1600]);
+          } else if (tkMinute == 15 || tkMinute == 45) {
+            /// 半刻，背景闪一下
+            intervalAction(() => animationController?.forward,
+                millisecondInterval: [300]);
+          }
+        }
+      }
+      refreshClock = false;
+      refreshTime(now);
     }
 
     setState(() {
-      refreshTime(now);
       tk = (tk - 1).abs();
+    });
+  }
+
+  Future<int> showAlarmSelect(BuildContext context) async {
+    int ret = 0;
+    await Picker(
+        adapter: PickerDataAdapter<int>(
+            pickerdata: [1, 3, 5, 10, 15, 20, 30, 45, 60]),
+        delimiter: [
+          PickerDelimiter(
+              child: Container(
+            width: 60.0,
+            alignment: Alignment.center,
+            child: Text("分钟"),
+          ))
+        ],
+        selecteds: [4],
+        textStyle: TextStyle(fontSize: 24, color: Colors.grey),
+        selectedTextStyle: TextStyle(fontSize: 26, color: Colors.black),
+        cancelText: "取消",
+        confirmText: "设置",
+        hideHeader: true,
+        title: Text("请选择定时闹钟时长"),
+        onSelect: (picker, idx, value) {
+          Vibrate.littleShake();
+        },
+        onConfirm: (Picker picker, List value) async {
+          // print(picker.getSelectedValues().first);
+          // setState(() {
+          //   countDownMode = true;
+          // });
+          // Future.delayed(
+          //     Duration(minutes: picker.getSelectedValues().first), showAlarm);
+          // showToast("闹钟已设置");
+          ret = picker.getSelectedValues().first;
+        }).showDialog(context);
+    return ret;
+  }
+
+  void showAlarm() {
+    showToast(
+      "您设置的提醒时间已到",
+      showInSec: 10,
+    );
+    Vibrate.keepVibrate(10);
+    FlashLamp.flash(pattern: [50, 100, 50, 100, 50, 500, 50, 100, 50, 100, 50]);
+    setState(() {
+      countDownMode = false;
     });
   }
 
@@ -315,6 +613,7 @@ class DigitalClockState extends State<DigitalClock>
       width: picItem.rect.width * scale,
       margin: buildEdgeRect(picItem.rect),
       alignment: Alignment.center,
+      // child: initHourFlipNumber(picItem,initValue: value),
       child: hourFlipNumber,
     );
   }
@@ -327,7 +626,61 @@ class DigitalClockState extends State<DigitalClock>
       width: picItem.rect.width * scale,
       margin: buildEdgeRect(picItem.rect),
       alignment: Alignment.center,
+      // child: initMinuteFlipNumber(picItem,initValue: value),
       child: minuteFlipNumber,
+    );
+  }
+
+  Widget buildSecondFlipItem(int value, ItemConfig picItem, String basePath) {
+    return Container(
+      // height: widget.config.height * scale,
+      // width: widget.config.width * scale,
+      height: picItem.rect.height * scale,
+      width: picItem.rect.width * scale,
+      margin: buildEdgeRect(picItem.rect),
+      alignment: Alignment.center,
+      // child: initSecondFlipNumber(picItem,initValue: value),
+      child: secondFlipNumber,
+    );
+  }
+
+  Widget buildCdHourFlipItem(int value, ItemConfig picItem, String basePath) {
+    return Container(
+      // height: widget.config.height * scale,
+      // width: widget.config.width * scale,
+      // color: Colors.grey.withAlpha(50),
+      height: picItem.rect.height * scale,
+      width: picItem.rect.width * scale,
+      margin: buildEdgeRect(picItem.rect),
+      alignment: Alignment.center,
+      // child: initCdHourFlipNumber(picItem,initValue: value),
+      child: cdHourFlipNumber,
+    );
+  }
+
+  Widget buildCdMinuteFlipItem(int value, ItemConfig picItem, String basePath) {
+    return Container(
+      // height: widget.config.height * scale,
+      // width: widget.config.width * scale,
+      height: picItem.rect.height * scale,
+      width: picItem.rect.width * scale,
+      margin: buildEdgeRect(picItem.rect),
+      alignment: Alignment.center,
+      // child: initCdMinuteFlipNumber(picItem,initValue: value),
+      child: cdMinuteFlipNumber,
+    );
+  }
+
+  Widget buildCdSecondFlipItem(int value, ItemConfig picItem, String basePath) {
+    return Container(
+      // height: widget.config.height * scale,
+      // width: widget.config.width * scale,
+      height: picItem.rect.height * scale,
+      width: picItem.rect.width * scale,
+      margin: buildEdgeRect(picItem.rect),
+      alignment: Alignment.center,
+      // child: initCdSecondFlipNumber(picItem,initValue: value),
+      child: cdSecondFlipNumber,
     );
   }
 
@@ -572,6 +925,30 @@ class DigitalClockState extends State<DigitalClock>
     return retWidget;
   }
 
+  Widget buildSecond(int s, ItemConfig? ic) {
+    if (ic == null) return nullWidget;
+    Widget retWidget;
+    switch (TimeStyle.values[ic.style]) {
+      case TimeStyle.number:
+        retWidget = buildTextItem(int2Str(s, width: 2), ic.rect, ic.textStyle);
+        break;
+      case TimeStyle.chinese:
+        retWidget =
+            buildTextItem(int2Str(s, width: 2) + "秒", ic.rect, ic.textStyle);
+        break;
+      case TimeStyle.pic:
+        retWidget = buildPicItem(s, ic);
+        break;
+      case TimeStyle.flip:
+        retWidget = buildMinuteFlipItem(s, ic, skinBasePath);
+        break;
+      default:
+        retWidget = nullWidget;
+        break;
+    }
+    return retWidget;
+  }
+
   Widget buildTiktok(int t, ItemConfig? ic) {
     if (ic == null) return nullWidget;
     Widget retWidget;
@@ -628,8 +1005,8 @@ class DigitalClockState extends State<DigitalClock>
         bodyImage.imgs!.length > 0) {
       picName = "${widget.config.skinBasePath}${bodyImage.imgs!.first}";
     }
-    logger.fine(
-        "height: ${widget.config.height * scale},width: ${widget.config.width * scale},rect:${buildEdgeRect(bodyImage.rect).collapsedSize}");
+    // logger.fine(
+    //     "height: ${widget.config.height * scale},width: ${widget.config.width * scale},rect:${buildEdgeRect(bodyImage.rect).collapsedSize}");
     return Container(
       height: widget.config.height * scale,
       width: widget.config.width * scale,
@@ -817,15 +1194,151 @@ class DigitalClockState extends State<DigitalClock>
     );
   }
 
-  @override
-  Widget build(BuildContext context) {
-    // if (widget.sizeChange) {
-    //   initScale();
-    // }
-    if(widget.config.skinName.compareTo(currentSkinName) != 0 ||widget.sizeChange){
-      // initScale();
-      init();
+  Widget buildCountDownControl(ItemConfig? countDownItem, String basePath) {
+    if (countDownItem == null) return nullWidget;
+
+    String? picName;
+    if (countDownItem.style == ActionStyle.pic.index) {
+      if (countDownItem.imgs != null && countDownItem.imgs!.length > 1) {
+        if (isSlient)
+          picName = "$basePath${countDownItem.imgs![0]}";
+        else
+          picName = "$basePath${countDownItem.imgs![1]}";
+      }
+      if (countDownItem.imgPrename != null ||
+          countDownItem.imgExtname != null) {
+        if (isSlient)
+          picName =
+              "$basePath${countDownItem.imgPrename}00${countDownItem.imgExtname}";
+        else
+          picName =
+              "$basePath${countDownItem.imgPrename}01${countDownItem.imgExtname}";
+      }
     }
+    if (countDownItem.style == ActionStyle.icon.index) {
+      if (countDownItem.imgs != null && countDownItem.imgs!.length > 1) {
+        if (countDownMode) {
+          picName = countDownItem.imgs![0];
+        } else {
+          picName = countDownItem.imgs![1];
+        }
+      }
+    }
+    // print("skinRect:${skinItem.rect}");
+    return GestureDetector(
+      onTap: () async {
+        if (countDownMode) {
+          // refreshTime(DateTime.now());
+          countDownOver();
+        } else {
+          int cdMin = await showAlarmSelect(context);
+
+          if (cdMin > 0) {
+            countDownBegin(cdMin);
+          }
+        }
+      },
+      child: Container(
+        color: Colors.transparent,
+        // height: widget.config.height * scale,
+        // width: widget.config.width * scale,
+        height: countDownItem.rect.height * scale,
+        width: countDownItem.rect.width * scale,
+        margin: buildEdgeRect(countDownItem.rect),
+        alignment: Alignment.center,
+        child: countDownItem.style == ActionStyle.pic.index
+            ? buildImage(
+                picName,
+                countDownItem.rect.size,
+                fit: BoxFit.cover,
+              )
+            : countDownItem.style == ActionStyle.icon.index
+                ? Icon(
+                    new IconData(
+                        int.parse(
+                            picName ?? Icons.restore.codePoint.toString()),
+                        fontFamily: "MaterialIcons"),
+                    color: widget.config.foregroundColor,
+                    size: countDownItem.rect.height * scale,
+                  )
+                : nullWidget,
+      ),
+    );
+  }
+
+  Widget buildCountDownHour(int h, ItemConfig? ic) {
+    if (ic == null) return nullWidget;
+    Widget retWidget;
+    switch (TimeStyle.values[ic.style]) {
+      case TimeStyle.number:
+        retWidget = buildTextItem(int2Str(h, width: 2), ic.rect, ic.textStyle);
+        break;
+      case TimeStyle.chinese:
+        retWidget =
+            buildTextItem(int2Str(h, width: 2) + "时", ic.rect, ic.textStyle);
+        break;
+      case TimeStyle.pic:
+        retWidget = buildPicItem(h, ic);
+        break;
+      case TimeStyle.flip:
+        retWidget = buildCdHourFlipItem(h, ic, skinBasePath);
+        break;
+      default:
+        retWidget = nullWidget;
+        break;
+    }
+    return retWidget;
+  }
+
+  Widget buildCountDownMinute(int m, ItemConfig? ic) {
+    if (ic == null) return nullWidget;
+    Widget retWidget;
+    switch (TimeStyle.values[ic.style]) {
+      case TimeStyle.number:
+        retWidget = buildTextItem(int2Str(m, width: 2), ic.rect, ic.textStyle);
+        break;
+      case TimeStyle.chinese:
+        retWidget =
+            buildTextItem(int2Str(m, width: 2) + "分", ic.rect, ic.textStyle);
+        break;
+      case TimeStyle.pic:
+        retWidget = buildPicItem(m, ic);
+        break;
+      case TimeStyle.flip:
+        retWidget = buildCdMinuteFlipItem(m, ic, skinBasePath);
+        break;
+      default:
+        retWidget = nullWidget;
+        break;
+    }
+    return retWidget;
+  }
+
+  Widget buildCountDownSecond(int s, ItemConfig? ic) {
+    if (ic == null) return nullWidget;
+    Widget retWidget;
+    switch (TimeStyle.values[ic.style]) {
+      case TimeStyle.number:
+        retWidget = buildTextItem(int2Str(s, width: 2), ic.rect, ic.textStyle);
+        break;
+      case TimeStyle.chinese:
+        retWidget =
+            buildTextItem(int2Str(s, width: 2) + "秒", ic.rect, ic.textStyle);
+        break;
+      case TimeStyle.pic:
+        retWidget = buildPicItem(s, ic);
+        break;
+      case TimeStyle.flip:
+        retWidget = buildCdSecondFlipItem(s, ic, skinBasePath);
+        break;
+      default:
+        retWidget = nullWidget;
+        break;
+    }
+    return retWidget;
+  }
+
+  Widget showClock() {
     return Container(
         height: widget.height,
         width: widget.width,
@@ -875,8 +1388,92 @@ class DigitalClockState extends State<DigitalClock>
             ///slient
             buildSlientControl(
                 widget.config.slientItem, widget.config.skinBasePath ?? ""),
+
+            ///countDown
+            buildCountDownControl(
+                widget.config.countDownItem, widget.config.skinBasePath ?? ""),
           ],
         ));
+  }
+
+  Widget showCountDown() {
+    return Container(
+        height: widget.height,
+        width: widget.width,
+        color: animation.value ?? widget.config.backgroundColor,
+        child: Stack(
+          alignment: Alignment.center,
+          children: [
+            ///底色或底图
+            buildBackgroundImage(widget.config.backgroundImage),
+
+            ///主体图片
+            buildBodyImage(widget.config.bodyImage),
+
+            ///年
+            // buildYear(years, widget.config.yearItem),
+
+            ///月
+            // buildMonth(months, widget.config.monthItem),
+
+            ///日
+            // buildDay(days, widget.config.dayItem),
+
+            ///星期
+            // buildWeekDay(weekday, widget.config.weekdayItem),
+
+            ///小时
+            // buildHour(hours, widget.config.hourItem),
+
+            ///分钟
+            // buildMinute(minutes, widget.config.minuteItem),
+
+            ///倒计时小时
+            buildCountDownHour(cdHours!, widget.config.cdHourItem),
+
+            ///倒计时分钟
+            buildCountDownMinute(cdMinutes!, widget.config.cdMinuteItem),
+
+            ///倒计时秒钟
+            buildCountDownSecond(cdSeconds!, widget.config.cdSecondItem),
+
+            ///Tiktok
+            buildTiktok(tk, widget.config.tiktokItem),
+
+            ///上下午标志
+            // widget.config.timeType == TimeType.h12
+            //     ? buildH12(h12, widget.config.h12Item)
+            //     : Container(),
+
+            ///skin
+            buildSettingControl(
+                widget.config.settingItem, widget.config.skinBasePath ?? ""),
+
+            ///exit
+            buildExitControl(widget.config.exitItem),
+
+            ///slient
+            buildSlientControl(
+                widget.config.slientItem, widget.config.skinBasePath ?? ""),
+
+            ///countDown
+            buildCountDownControl(
+                widget.config.countDownItem, widget.config.skinBasePath ?? ""),
+          ],
+        ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // if (widget.sizeChange) {
+    //   initScale();
+    // }
+    if (widget.config.skinName.compareTo(currentSkinName) != 0 ||
+        widget.sizeChange) {
+      // initScale();
+      init();
+    }
+    return countDownMode ? showCountDown() : showClock();
   }
 }
 
@@ -890,6 +1487,8 @@ enum TikTokStyle { text, pic, icon }
 enum ActionStyle { text, pic, icon, empty }
 
 enum ClockEventType {
+  countDownStart,
+  countDownStop,
   slientChange,
   slientScheduleChange,
   sleepScheduleChange,
@@ -996,7 +1595,9 @@ class DigitalClockConfig {
   ItemConfig? yearItem, monthItem, dayItem, weekdayItem;
 
   ///时间相关设置
-  ItemConfig? hourItem, minuteItem;
+  ItemConfig? hourItem, minuteItem, secondItem;
+
+  ItemConfig? cdHourItem, cdMinuteItem, cdSecondItem;
 
   ///12小时模式相关设置
   TimeType timeType;
@@ -1013,6 +1614,9 @@ class DigitalClockConfig {
 
   ///静音控制
   ItemConfig? slientItem;
+
+  ///倒计时控制
+  ItemConfig? countDownItem;
 
   ///背景设置
   Color backgroundColor;
@@ -1042,11 +1646,16 @@ class DigitalClockConfig {
       this.timeType = TimeType.h24,
       this.hourItem,
       this.minuteItem,
+      this.secondItem,
       this.h12Item,
       this.tiktokItem,
       this.settingItem,
       this.exitItem,
       this.slientItem,
+      this.countDownItem,
+      this.cdHourItem,
+      this.cdMinuteItem,
+      this.cdSecondItem,
       this.backgroundColor = Colors.black,
       this.blinkColor = Colors.white,
       this.backgroundImage,
@@ -1073,11 +1682,16 @@ class DigitalClockConfig {
       weekdayItem: ItemConfig.fromJson(jMap["weekdayItem"]),
       hourItem: ItemConfig.fromJson(jMap["hourItem"]),
       minuteItem: ItemConfig.fromJson(jMap["minuteItem"]),
+      secondItem: ItemConfig.fromJson(jMap["secondItem"]),
       h12Item: ItemConfig.fromJson(jMap["h12Item"]),
       tiktokItem: ItemConfig.fromJson(jMap["tiktokItem"]),
       settingItem: ItemConfig.fromJson(jMap["settingItem"]),
       exitItem: ItemConfig.fromJson(jMap["exitItem"]),
       slientItem: ItemConfig.fromJson(jMap["slientItem"]),
+      countDownItem: ItemConfig.fromJson(jMap["countDownItem"]),
+      cdHourItem: ItemConfig.fromJson(jMap["cdHourItem"]),
+      cdMinuteItem: ItemConfig.fromJson(jMap["cdMinuteItem"]),
+      cdSecondItem: ItemConfig.fromJson(jMap["cdSecondItem"]),
       backgroundColor: Color(jMap["backgroundColor"] ?? 0x00000000),
       blinkColor:
           jMap["blinkColor"] == null ? Colors.white : Color(jMap["blinkColor"]),
@@ -1100,12 +1714,17 @@ class DigitalClockConfig {
       "weekdayItem": weekdayItem,
       "hourItem": hourItem,
       "minuteItem": minuteItem,
+      "secondItem": secondItem,
       "timeType": timeType.index,
       "h12Item": h12Item,
       "tiktokItem": tiktokItem,
       "settingItem": settingItem,
       "exitItem": exitItem,
       "slientItem": slientItem,
+      "countDownItem": countDownItem,
+      "cdHourItem": cdHourItem,
+      "cdMinuteItem": cdMinuteItem,
+      "cdSecondItem": cdSecondItem,
       "backgroundColor": backgroundColor.value,
       "blinkColor": blinkColor.value,
       "foregroundColor": foregroundColor.value,

@@ -15,7 +15,8 @@ dependencies:
   vibration: ^1.7.4-nullsafety.0
   cron: ^0.4.0
   soundpool: ^2.2.0
-  fluttertoast: ^8.0.8
+  flutter_easyloading: ^3.0.3
+  flutter_picker: ^2.0.2
   phone_lamp:
     git:
       url: https://github.com/olgeer/phone_lamp.git

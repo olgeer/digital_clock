@@ -1,7 +1,5 @@
-import 'dart:io';
-
 import 'package:cron/cron.dart';
-import 'package:fluttertoast/fluttertoast.dart';
+import 'package:digital_clock/src/Toast.dart';
 import 'package:logging/logging.dart';
 
 import 'define.dart';
@@ -36,17 +34,17 @@ class AlarmClock {
 
   ///刻钟报时音文件
   bool canQuarterAlarm = true;
-  dynamic? quarterAlarmSound;
+  dynamic quarterAlarmSound;
   int? quarterSoundIdx;
 
   ///半点报时音文件
   bool canHalfAlarm = true;
-  dynamic? halfAlarmSound;
+  dynamic halfAlarmSound;
   int? halfSoundIdx;
 
   ///整点报时音文件
   bool canHourAlarm = true;
-  dynamic? hourAlarmSound;
+  dynamic hourAlarmSound;
   int? oclockSoundIdx;
 
   ///静音开关
@@ -284,21 +282,20 @@ class AlarmClock {
     showToast(alertMsg.tl(args: [alertTime]));
   }
 
-  void showToast(String msg,
-      {int showInSec = 2,
-      ToastGravity gravity = ToastGravity.BOTTOM,
-      double fontSize = 16.0,
-      bool debugMode = true}) {
-    if(Platform.isAndroid||Platform.isIOS) {
-      Fluttertoast.showToast(
-        msg: msg,
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: gravity,
-        timeInSecForIosWeb: showInSec,
-        fontSize: fontSize,
-      );
-    }
-    if (debugMode) logger.fine(msg);
-  }
+// void showToast(String msg,
+//     {int showInSec = 2,
+//     ToastGravity gravity = ToastGravity.BOTTOM,
+//     double fontSize = 16.0,
+//     bool debugMode = true}) {
+//   if(Platform.isAndroid||Platform.isIOS) {
+//     Fluttertoast.showToast(
+//       msg: msg,
+//       toastLength: Toast.LENGTH_SHORT,
+//       gravity: gravity,
+//       timeInSecForIosWeb: showInSec,
+//       fontSize: fontSize,
+//     );
+//   }
+//   if (debugMode) logger.fine(msg);
+// }
 }
-

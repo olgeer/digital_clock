@@ -6,22 +6,27 @@ import 'package:logging/logging.dart';
 
 import 'digitalClock.dart';
 
+typedef VoidFunction = void Function();
+
 class FlipNumber extends StatefulWidget {
+  final String name;
   final ItemConfig numberItem;
   final String basePath;
   double scale;
   final Duration animationDuration;
   final int min, max;
   int? currentValue;
-  final bool canRevese, isPositiveSequence;
-  late AnimationController controller;
-  late void Function() refresh;
+  bool canRevese, isPositiveSequence;
+  AnimationController? controller;
+  VoidFunction refresh = () {};
+  void Function(int) initValue = (_) {};
 
-  FlipNumber({
+  FlipNumber(
+    this.name, {
     required this.numberItem,
     required this.basePath,
     this.scale = 1.0,
-    this.animationDuration = const Duration(milliseconds: 2000),
+    this.animationDuration = const Duration(milliseconds: 1000),
     this.min = 0,
     this.max = 23,
     this.canRevese = true,
@@ -57,16 +62,23 @@ class _FlipNumberState extends State<FlipNumber>
 
   Logger logger = Logger("FlipNumber");
 
-  void refresh() {
-    setState(() {});
+  void _refresh() {
+    if (mounted) setState(() {});
+  }
+
+  void _initValue(int value) {
+    widget.currentValue = value;
+    calcValue(initValue: value);
+    _refresh();
   }
 
   @override
   void initState() {
     super.initState();
-    logger.finer("initState running...");
+    logger.finer("initState running... initValue:${widget.currentValue}");
 
-    widget.refresh=refresh;
+    widget.refresh = _refresh;
+    widget.initValue = _initValue;
 
     _isPositiveSequence = widget.isPositiveSequence;
     calcValue(initValue: widget.currentValue ?? widget.min);

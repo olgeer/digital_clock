@@ -37,7 +37,7 @@ dependencies:
   logging: ^1.0.2
   console: ^4.1.0
   digital_clock:
-    path: ../..
+    path: ..
 
 dev_dependencies:
   flutter_test:

@@ -47,6 +47,10 @@ class AlarmClock {
   dynamic hourAlarmSound;
   int? oclockSoundIdx;
 
+  /// 倒计时到点提醒
+  dynamic callAlarmSound;
+  int? callSoundIdx;
+
   ///静音开关
   bool isSlient = false;
 
@@ -77,7 +81,7 @@ class AlarmClock {
       this.isSlient = false,
       this.quarterAlarmSound,
       this.halfAlarmSound,
-      this.hourAlarmSound}) {
+      this.hourAlarmSound,this.callAlarmSound}) {
     if (newSchedule != null) {
       if (newSchedule is Schedule) alarmSchedule = newSchedule;
       if (newSchedule is String) alarmSchedule = Schedule.parse(newSchedule);
@@ -130,6 +134,8 @@ class AlarmClock {
         halfSoundIdx = await Sound.loadSound(halfAlarmSound);
       if (quarterAlarmSound != null)
         quarterSoundIdx = await Sound.loadSound(quarterAlarmSound);
+      if (callAlarmSound != null)
+        callSoundIdx = await Sound.loadSound(callAlarmSound);
     }
 
     // Uri uriRes=Uri.parse("http://olgeer.3322.org:8888/justclock/iphone.mp3");
@@ -190,6 +196,10 @@ class AlarmClock {
     specialAlarms.putIfAbsent(alarmTemplate, () => s);
   }
 
+  void removeSpecialSchedule(String alarmTemplate){
+    specialAlarms.remove(alarmTemplate);
+  }
+
   void clearSpecialSchedule() => specialAlarms.clear();
 
   void dispose() {
@@ -199,19 +209,32 @@ class AlarmClock {
     alarmTask.cancel();
   }
 
+  ///
   void playSound(int soundIdx,
       {bool repeat = false,
       Duration duration = const Duration(milliseconds: 500)}) {
-    //仅设定时间段内报时
-    if (!(slientSchedule?.match(DateTime.now()) ?? false) && !isSlient) {
+    //仅设定时间段内报时，且不播放soundIdx为-1的音频
+    if (!(slientSchedule?.match(DateTime.now()) ?? false) && !isSlient && soundIdx!=-1) {
       Sound.play(soundIdx, repeat: repeat, duration: duration);
     }
+  }
+
+  void callAlarm(){
+    if (enableAlarmSound) {
+      int playSoundIdx=callSoundIdx??oclockSoundIdx??halfSoundIdx??quarterSoundIdx??-1;
+      playSound(playSoundIdx,
+          repeat: true, duration: Duration(seconds: 4));
+    }
+    if (enableFlashLamp)
+      intervalAction(FlashLamp.flash,
+          millisecondInterval: [300, 1300, 1600]);
+    if (enableVibrate) Vibrate.mediumVibrate();
   }
 
   void alarm() {
     var now = DateTime.now();
     // if (sleepDisableAction != null) sleepDisableAction();
-    sleepDisableAction?.call();
+    // sleepDisableAction?.call();
     String alertMsg = this.alarmTemplate;
     String alertTime;
     switch (now.minute) {

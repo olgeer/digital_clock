@@ -9,11 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:logging/logging.dart';
-
 import 'define.dart';
 import 'flipNumber.dart';
-
-typedef contextProc = void Function(BuildContext context);
 
 class DigitalClock extends StatefulWidget {
   double height;
@@ -151,7 +148,7 @@ class DigitalClockState extends State<DigitalClock>
           isPositiveSequence: true,
           min: widget.config.timeType == TimeType.h12 ? 1 : 0,
           max: widget.config.timeType == TimeType.h12 ? 12 : 23,
-          currentValue: initValue ?? hours,
+          startValue: initValue ?? hours,
         );
       } else {
         hourFlipNumber?.scale = scale;
@@ -177,7 +174,7 @@ class DigitalClockState extends State<DigitalClock>
           isPositiveSequence: true,
           min: 0,
           max: 59,
-          currentValue: initValue ?? minutes,
+          startValue: initValue ?? minutes,
         );
       } else {
         minuteFlipNumber?.scale = scale;
@@ -203,7 +200,7 @@ class DigitalClockState extends State<DigitalClock>
           isPositiveSequence: true,
           min: 0,
           max: 59,
-          currentValue: initValue ?? seconds,
+          startValue: initValue ?? seconds,
         );
       } else {
         secondFlipNumber?.scale = scale;
@@ -229,7 +226,7 @@ class DigitalClockState extends State<DigitalClock>
           isPositiveSequence: false,
           min: 0,
           max: 59,
-          currentValue: initValue ?? cdHours,
+          startValue: initValue ?? cdHours,
         );
       } else {
         cdHourFlipNumber?.scale = scale;
@@ -255,7 +252,7 @@ class DigitalClockState extends State<DigitalClock>
           isPositiveSequence: false,
           min: 0,
           max: 59,
-          currentValue: initValue ?? cdMinutes,
+          startValue: initValue ?? cdMinutes,
         );
       } else {
         cdMinuteFlipNumber?.scale = scale;
@@ -281,7 +278,7 @@ class DigitalClockState extends State<DigitalClock>
           isPositiveSequence: false,
           min: 0,
           max: 59,
-          currentValue: initValue ?? cdSeconds,
+          startValue: initValue ?? cdSeconds,
         );
       } else {
         cdSecondFlipNumber?.scale = scale;
@@ -326,8 +323,6 @@ class DigitalClockState extends State<DigitalClock>
     return s;
   }
 
-  void nothing() {}
-
   void countDownBegin(int cdMin) {
     countDownDuration = Duration(minutes: cdMin);
     countDownBeginTime = DateTime.now();
@@ -336,13 +331,13 @@ class DigitalClockState extends State<DigitalClock>
     cdSeconds = 0;
     widget.config.cdHourItem?.style == TimeStyle.flip.index
         ? cdHourFlipNumber?.initValue(cdHours!)
-        : nothing();
+        : DNT();
     widget.config.cdMinuteItem?.style == TimeStyle.flip.index
         ? cdMinuteFlipNumber?.initValue(cdMinutes!)
-        : nothing();
+        : DNT();
     widget.config.cdSecondItem?.style == TimeStyle.flip.index
         ? cdSecondFlipNumber?.initValue(cdSeconds!)
-        : nothing();
+        : DNT();
     setState(() {
       countDownMode = true;
       refreshCd = true;
@@ -355,13 +350,13 @@ class DigitalClockState extends State<DigitalClock>
     refreshTime(DateTime.now());
     widget.config.hourItem?.style == TimeStyle.flip.index
         ? hourFlipNumber?.initValue(hours)
-        : nothing();
+        : DNT();
     widget.config.minuteItem?.style == TimeStyle.flip.index
         ? minuteFlipNumber?.initValue(minutes)
-        : nothing();
+        : DNT();
     widget.config.secondItem?.style == TimeStyle.flip.index
         ? secondFlipNumber?.initValue(seconds)
-        : nothing();
+        : DNT();
 
     setState(() {
       refreshClock = true;

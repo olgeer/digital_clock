@@ -5,15 +5,14 @@ typedef eventCall = Function(dynamic value);
 typedef contextProc = Function(BuildContext context);
 typedef actionCall = Function();
 
-
 extension MatchExtension on Schedule {
   bool match(DateTime now) {
-    if (this.seconds?.contains(now.second) == false) return false;
-    if (this.minutes?.contains(now.minute) == false) return false;
-    if (this.hours?.contains(now.hour) == false) return false;
-    if (this.days?.contains(now.day) == false) return false;
-    if (this.months?.contains(now.month) == false) return false;
-    if (this.weekdays?.contains(now.weekday) == false) return false;
+    if (seconds?.contains(now.second) == false) return false;
+    if (minutes?.contains(now.minute) == false) return false;
+    if (hours?.contains(now.hour) == false) return false;
+    if (days?.contains(now.day) == false) return false;
+    if (months?.contains(now.month) == false) return false;
+    if (weekdays?.contains(now.weekday) == false) return false;
     return true;
   }
 }

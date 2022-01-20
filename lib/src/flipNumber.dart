@@ -15,8 +15,8 @@ class FlipNumber extends StatefulWidget {
   double scale;
   final Duration animationDuration;
   final int min, max;
-  int? currentValue;
-  bool canRevese, isPositiveSequence;
+  int? currentValue,startValue;
+  bool canRevese, isPositiveSequence,autoRun;
   AnimationController? controller;
   VoidFunction refresh = () {};
   void Function(int) initValue = (_) {};
@@ -28,10 +28,12 @@ class FlipNumber extends StatefulWidget {
     this.scale = 1.0,
     this.animationDuration = const Duration(milliseconds: 1000),
     this.min = 0,
-    this.max = 23,
-    this.canRevese = true,
+    this.max = 59,
+    this.canRevese = false,
     this.isPositiveSequence = true,
+        this.autoRun=false,
     this.currentValue,
+        this.startValue,
   });
 
   @override
@@ -75,14 +77,14 @@ class _FlipNumberState extends State<FlipNumber>
   @override
   void initState() {
     super.initState();
-    logger.finer("initState running... initValue:${widget.currentValue}");
+    logger.finer("initState running... initValue:${widget.startValue}");
 
     widget.refresh = _refresh;
     widget.initValue = _initValue;
 
     _isPositiveSequence = widget.isPositiveSequence;
-    calcValue(initValue: widget.currentValue ?? widget.min);
-    widget.currentValue = null;
+    calcValue(initValue: widget.startValue ?? widget.min);
+    // widget.currentValue = null;
 
     // 5 秒动画，利用 reset、forward 重复执行
     _controller = AnimationController(
@@ -125,16 +127,21 @@ class _FlipNumberState extends State<FlipNumber>
     // 动画完成时，添加数字检测，实现动画
     _controller.addStatusListener(animationListener);
     // 默认开启动画，也使用 press 效果触发。
-    // _controller.forward();
+    if(widget.autoRun) {
+      _controller.forward();
+    }
   }
 
   void animationListener(AnimationStatus status) {
     if (status == AnimationStatus.completed) {
       calcValue(initValue: widget.currentValue);
+      widget.currentValue=null;
       // 重置动画
       _controller.reset();
       // 重新开启动画
-      // _controller.forward();
+      if(widget.autoRun) {
+        _controller.forward();
+      }
       setState(() {});
     }
   }

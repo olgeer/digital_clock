@@ -1,11 +1,6 @@
+import 'package:base_utility/base_utility.dart';
 import 'package:cron/cron.dart';
-import 'package:digital_clock/src/Toast.dart';
 import 'package:logging/logging.dart';
-
-import 'define.dart';
-import 'lamp.dart';
-import 'sound.dart';
-import 'vibrate.dart';
 
 class AlarmClock {
   late Cron cron;
@@ -65,23 +60,22 @@ class AlarmClock {
 
   final Logger logger = Logger('AlarmClock');
 
-  AlarmClock(
-      {dynamic newSchedule,
-      actionCall? newAlarmAction,
-      dynamic noSoundSchedule,
-      dynamic noWakeLockSchedule,
-      this.sleepEnableAction,
-      this.sleepDisableAction,
-      this.enableVibrate = true,
-      this.enableFlashLamp = true,
-      this.enableAlarmSound = true,
-      this.canHourAlarm = true,
-      this.canHalfAlarm = true,
-      this.canQuarterAlarm = true,
-      this.isSlient = false,
-      this.quarterAlarmSound,
-      this.halfAlarmSound,
-      this.hourAlarmSound,this.callAlarmSound}) {
+  AlarmClock({dynamic newSchedule,
+    actionCall? newAlarmAction,
+    dynamic noSoundSchedule,
+    dynamic noWakeLockSchedule,
+    this.sleepEnableAction,
+    this.sleepDisableAction,
+    this.enableVibrate = true,
+    this.enableFlashLamp = true,
+    this.enableAlarmSound = true,
+    this.canHourAlarm = true,
+    this.canHalfAlarm = true,
+    this.canQuarterAlarm = true,
+    this.isSlient = false,
+    this.quarterAlarmSound,
+    this.halfAlarmSound,
+    this.hourAlarmSound,this.callAlarmSound}) {
     if (newSchedule != null) {
       if (newSchedule is Schedule) alarmSchedule = newSchedule;
       if (newSchedule is String) alarmSchedule = Schedule.parse(newSchedule);
@@ -212,7 +206,7 @@ class AlarmClock {
   ///
   void playSound(int soundIdx,
       {bool repeat = false,
-      Duration duration = const Duration(milliseconds: 500)}) {
+        Duration duration = const Duration(milliseconds: 500)}) {
     //仅设定时间段内报时，且不播放soundIdx为-1的音频
     if (!(slientSchedule?.match(DateTime.now()) ?? false) && !isSlient && soundIdx!=-1) {
       Sound.play(soundIdx, repeat: repeat, duration: duration);

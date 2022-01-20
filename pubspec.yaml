@@ -10,17 +10,15 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+
   logging: ^1.0.2
-  wakelock: ^0.5.6
-  vibration: ^1.7.4-nullsafety.0
   cron: ^0.4.0
-  soundpool: ^2.2.0
-  flutter_easyloading: ^3.0.3
   flutter_picker: ^2.0.2
-  phone_lamp:
+  base_utility:
     git:
-      url: https://github.com/olgeer/phone_lamp.git
-      ref: main
+      url: https://github.com/olgeer/base_utility.git
+      ref: master
+#    path: ../base_utility
 
 dev_dependencies:
   flutter_test:

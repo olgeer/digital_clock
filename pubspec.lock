@@ -8,6 +8,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.8.2"
+  base_utility:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: master
+      resolved-ref: "5728be170ab134434882a66d3b5395971bea41df"
+      url: "https://github.com/olgeer/base_utility.git"
+    source: git
+    version: "1.0.0"
   boolean_selector:
     dependency: transitive
     description:
@@ -57,25 +66,11 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.2.0"
-  ffi:
-    dependency: transitive
-    description:
-      name: ffi
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.1.0"
   flutter:
     dependency: "direct main"
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_easyloading:
-    dependency: "direct main"
-    description:
-      name: flutter_easyloading
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "3.0.3"
   flutter_picker:
     dependency: "direct main"
     description:
@@ -83,44 +78,11 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.2"
-  flutter_spinkit:
-    dependency: transitive
-    description:
-      name: flutter_spinkit
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "5.1.0"
   flutter_test:
     dependency: "direct dev"
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_web_plugins:
-    dependency: transitive
-    description: flutter
-    source: sdk
-    version: "0.0.0"
-  http:
-    dependency: transitive
-    description:
-      name: http
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.13.1"
-  http_parser:
-    dependency: transitive
-    description:
-      name: http_parser
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "4.0.0"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.6.3"
   logging:
     dependency: "direct main"
     description:
@@ -149,62 +111,11 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.8.0"
-  pedantic:
-    dependency: transitive
-    description:
-      name: pedantic
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.11.0"
-  phone_lamp:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: main
-      resolved-ref: "1202d707043d032ed2a68be570c7fb9b5b234894"
-      url: "https://github.com/olgeer/phone_lamp.git"
-    source: git
-    version: "0.0.1"
-  plugin_platform_interface:
-    dependency: transitive
-    description:
-      name: plugin_platform_interface
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.99"
-  soundpool:
-    dependency: "direct main"
-    description:
-      name: soundpool
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.2.0"
-  soundpool_macos:
-    dependency: transitive
-    description:
-      name: soundpool_macos
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.1.3"
-  soundpool_platform_interface:
-    dependency: transitive
-    description:
-      name: soundpool_platform_interface
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.1.0"
-  soundpool_web:
-    dependency: transitive
-    description:
-      name: soundpool_web
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.1.0"
   source_span:
     dependency: transitive
     description:
@@ -261,62 +172,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.1"
-  vibration:
-    dependency: "direct main"
-    description:
-      name: vibration
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.7.4-nullsafety.0"
-  vibration_web:
-    dependency: transitive
-    description:
-      name: vibration_web
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.6.3-nullsafety.0"
-  wakelock:
-    dependency: "direct main"
-    description:
-      name: wakelock
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.5.6"
-  wakelock_macos:
-    dependency: transitive
-    description:
-      name: wakelock_macos
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.4.0"
-  wakelock_platform_interface:
-    dependency: transitive
-    description:
-      name: wakelock_platform_interface
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.3.0"
-  wakelock_web:
-    dependency: transitive
-    description:
-      name: wakelock_web
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.4.0"
-  wakelock_windows:
-    dependency: transitive
-    description:
-      name: wakelock_windows
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "0.2.0"
-  win32:
-    dependency: transitive
-    description:
-      name: win32
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.0.5"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
-  flutter: ">=2.0.0"
+  dart: ">=2.15.1 <3.0.0"
+  flutter: ">=1.17.0"

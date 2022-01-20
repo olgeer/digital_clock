@@ -2,14 +2,12 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:digital_clock/src/Toast.dart';
-import 'package:digital_clock/src/lamp.dart';
-import 'package:digital_clock/src/vibrate.dart';
+import 'package:base_utility/base_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_picker/flutter_picker.dart';
 import 'package:logging/logging.dart';
-import 'define.dart';
+
 import 'flipNumber.dart';
 
 class DigitalClock extends StatefulWidget {
@@ -519,7 +517,7 @@ class DigitalClockState extends State<DigitalClock>
       "您设置的提醒时间已到",
       showInSec: 10,
     );
-    Vibrate.keepVibrate(10);
+    Vibrate.keepVibrate(secend: 10);
     FlashLamp.flash(pattern: [50, 100, 50, 100, 50, 500, 50, 100, 50, 100, 50]);
     setState(() {
       countDownMode = false;

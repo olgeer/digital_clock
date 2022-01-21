@@ -344,7 +344,7 @@ class DigitalClockState extends State<DigitalClock>
     });
   }
 
-  void countDownOver() {
+  void countDownOver({bool cancel = false}) {
     refreshTime(DateTime.now());
     widget.config.hourItem?.style == TimeStyle.flip.index
         ? hourFlipNumber?.initValue(hours)
@@ -360,7 +360,8 @@ class DigitalClockState extends State<DigitalClock>
       refreshClock = true;
       countDownMode = false;
     });
-    widget.fireClockEvent(ClockEvent(ClockEventType.countDownStop));
+    widget.fireClockEvent(
+        ClockEvent(ClockEventType.countDownStop, value: cancel));
   }
 
   /// 每秒处理显示转换及各种提醒
@@ -1222,7 +1223,7 @@ class DigitalClockState extends State<DigitalClock>
       onTap: () async {
         if (countDownMode) {
           // refreshTime(DateTime.now());
-          countDownOver();
+          countDownOver(cancel: true);
         } else {
           int cdMin = await showAlarmSelect(context);
 
@@ -1339,11 +1340,31 @@ class DigitalClockState extends State<DigitalClock>
         child: Stack(
           alignment: Alignment.center,
           children: [
+            //----------------------底层背景图片----------------------
             ///底色或底图
             buildBackgroundImage(widget.config.backgroundImage),
 
             ///主体图片
             buildBodyImage(widget.config.bodyImage),
+
+            //----------------------中层带显示控制组件----------------------
+            ///slient
+            buildSlientControl(
+                widget.config.slientItem, widget.config.skinBasePath ?? ""),
+
+            ///countDown
+            buildCountDownControl(
+                widget.config.countDownItem, widget.config.skinBasePath ?? ""),
+
+            //----------------------上层显示组件----------------------
+
+            ///Tiktok
+            buildTiktok(tk, widget.config.tiktokItem),
+
+            ///上下午标志
+            widget.config.timeType == TimeType.h12
+                ? buildH12(h12, widget.config.h12Item)
+                : Container(),
 
             ///年
             buildYear(years, widget.config.yearItem),
@@ -1363,28 +1384,13 @@ class DigitalClockState extends State<DigitalClock>
             ///分钟
             buildMinute(minutes, widget.config.minuteItem),
 
-            ///Tiktok
-            buildTiktok(tk, widget.config.tiktokItem),
-
-            ///上下午标志
-            widget.config.timeType == TimeType.h12
-                ? buildH12(h12, widget.config.h12Item)
-                : Container(),
-
-            ///skin
+            //----------------------顶层无显示控制组件----------------------
+            ///setting
             buildSettingControl(
                 widget.config.settingItem, widget.config.skinBasePath ?? ""),
 
             ///exit
             buildExitControl(widget.config.exitItem),
-
-            ///slient
-            buildSlientControl(
-                widget.config.slientItem, widget.config.skinBasePath ?? ""),
-
-            ///countDown
-            buildCountDownControl(
-                widget.config.countDownItem, widget.config.skinBasePath ?? ""),
           ],
         ));
   }
@@ -1397,29 +1403,25 @@ class DigitalClockState extends State<DigitalClock>
         child: Stack(
           alignment: Alignment.center,
           children: [
+            //----------------------底层背景图片----------------------
             ///底色或底图
             buildBackgroundImage(widget.config.backgroundImage),
 
             ///主体图片
             buildBodyImage(widget.config.bodyImage),
 
-            ///年
-            // buildYear(years, widget.config.yearItem),
+            //----------------------中层带显示控制组件----------------------
+            ///slient
+            buildSlientControl(
+                widget.config.slientItem, widget.config.skinBasePath ?? ""),
 
-            ///月
-            // buildMonth(months, widget.config.monthItem),
+            ///countDown
+            buildCountDownControl(
+                widget.config.countDownItem, widget.config.skinBasePath ?? ""),
 
-            ///日
-            // buildDay(days, widget.config.dayItem),
-
-            ///星期
-            // buildWeekDay(weekday, widget.config.weekdayItem),
-
-            ///小时
-            // buildHour(hours, widget.config.hourItem),
-
-            ///分钟
-            // buildMinute(minutes, widget.config.minuteItem),
+            //----------------------上层显示组件----------------------
+            ///Tiktok
+            buildTiktok(tk, widget.config.tiktokItem),
 
             ///倒计时小时
             buildCountDownHour(cdHours!, widget.config.cdHourItem),
@@ -1430,13 +1432,7 @@ class DigitalClockState extends State<DigitalClock>
             ///倒计时秒钟
             buildCountDownSecond(cdSeconds!, widget.config.cdSecondItem),
 
-            ///Tiktok
-            buildTiktok(tk, widget.config.tiktokItem),
-
-            ///上下午标志
-            // widget.config.timeType == TimeType.h12
-            //     ? buildH12(h12, widget.config.h12Item)
-            //     : Container(),
+            //----------------------顶层无显示控制组件----------------------
 
             ///skin
             buildSettingControl(
@@ -1445,13 +1441,6 @@ class DigitalClockState extends State<DigitalClock>
             ///exit
             buildExitControl(widget.config.exitItem),
 
-            ///slient
-            buildSlientControl(
-                widget.config.slientItem, widget.config.skinBasePath ?? ""),
-
-            ///countDown
-            buildCountDownControl(
-                widget.config.countDownItem, widget.config.skinBasePath ?? ""),
           ],
         ));
   }

@@ -6,7 +6,6 @@ import 'package:base_utility/base_utility.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_picker/flutter_picker.dart';
-import 'package:logging/logging.dart';
 
 import 'flipNumber.dart';
 
@@ -1061,7 +1060,7 @@ class DigitalClockState extends State<DigitalClock>
         alignment: Alignment.center,
         child: exitItem.style == ActionStyle.pic.index && picName != null
             ? buildImage(
-          picName,
+                picName,
                 exitItem.rect.size,
                 fit: BoxFit.cover,
               )
@@ -1440,7 +1439,6 @@ class DigitalClockState extends State<DigitalClock>
 
             ///exit
             buildExitControl(widget.config.exitItem),
-
           ],
         ));
   }

@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:base_utility/base_utility.dart';
 import 'package:digital_clock/digital_clock.dart';
 import 'package:flutter/material.dart';
-import 'package:logging/logging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

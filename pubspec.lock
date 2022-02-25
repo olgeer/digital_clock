@@ -27,7 +27,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: "48ab130bfbd89fb0d9f0b0628884ab08afd822b6"
+      resolved-ref: accfc16cc31f897a9c07b336d1c087a99e4c6bb4
       url: "https://github.com/olgeer/base_utility.git"
     source: git
     version: "1.1.2"

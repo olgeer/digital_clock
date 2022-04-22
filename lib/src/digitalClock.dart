@@ -479,8 +479,25 @@ class DigitalClockState extends State<DigitalClock>
   Future<int> showAlarmSelect(BuildContext context) async {
     int ret = 0;
     await Picker(
-        adapter: PickerDataAdapter<int>(
-            pickerdata: [1, 3, 5, 10, 15, 20, 30, 45, 60]),
+        adapter: PickerDataAdapter<int>(pickerdata: [
+          1,
+          3,
+          5,
+          8,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          90,
+          120
+        ]),
         delimiter: [
           PickerDelimiter(
               child: Container(
@@ -489,7 +506,7 @@ class DigitalClockState extends State<DigitalClock>
             child: Text("分钟"),
           ))
         ],
-        selecteds: [4],
+        selecteds: [5],
         textStyle: TextStyle(fontSize: 24, color: Colors.grey),
         selectedTextStyle: TextStyle(fontSize: 26, color: Colors.black),
         cancelText: "取消",

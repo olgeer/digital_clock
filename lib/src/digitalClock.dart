@@ -494,9 +494,7 @@ class DigitalClockState extends State<DigitalClock>
           45,
           50,
           55,
-          60,
-          90,
-          120
+          60
         ]),
         delimiter: [
           PickerDelimiter(

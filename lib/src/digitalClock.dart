@@ -1202,6 +1202,24 @@ class DigitalClockState extends State<DigitalClock>
     );
   }
 
+  Future exitCountDownDialog(BuildContext context) {
+    return showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+              title: Text("您真的要退出倒计时吗？"),
+              actions: <Widget>[
+                TextButton(
+                  child: Text("按错了"),
+                  onPressed: () => Navigator.pop(context, false),
+                ),
+                TextButton(
+                  child: Text("真心退出"),
+                  onPressed: () => Navigator.pop(context, true),
+                ),
+              ],
+            ));
+  }
+
   Widget buildCountDownControl(ItemConfig? countDownItem, String basePath) {
     if (countDownItem == null) return nullWidget;
 
@@ -1237,7 +1255,9 @@ class DigitalClockState extends State<DigitalClock>
       onTap: () async {
         if (countDownMode) {
           // refreshTime(DateTime.now());
-          countDownOver(cancel: true);
+          if (await exitCountDownDialog(context)) {
+            countDownOver(cancel: true);
+          }
         } else {
           int cdMin = await showAlarmSelect(context);
 
